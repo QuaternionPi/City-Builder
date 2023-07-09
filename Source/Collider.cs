@@ -1,6 +1,7 @@
 using System;
 using System.Numerics;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using Raylib_cs;
 
 namespace CityBuilder
@@ -9,5 +10,77 @@ namespace CityBuilder
     {
         public bool Collides(Vector2 point);
         public bool Collides(ICollider collider);
+    }
+    public struct RectangleCollider : ICollider, IPosition, IRectangle
+    {
+        public RectangleCollider(Vector2 position, Vector2 dimensions)
+        {
+            Position = position;
+            Dimensions = dimensions;
+        }
+        public RectangleCollider(Rectangle rectangle)
+        {
+            Rectangle = rectangle;
+        }
+        public float X { readonly get { return Position.X; } private set { Position = new(value, Position.Y); } }
+        public float Y { readonly get { return Position.Y; } private set { Position = new(Position.X, value); } }
+        [JsonInclude]
+        [JsonConverter(typeof(Vector2JsonConverter))]
+        public Vector2 Position { readonly get; private set; }
+        public float Width { readonly get { return Dimensions.X; } private set { Dimensions = new(value, Dimensions.Y); } }
+        public float Height { readonly get { return Dimensions.Y; } private set { Dimensions = new(Dimensions.X, value); } }
+        [JsonInclude]
+        [JsonConverter(typeof(Vector2JsonConverter))]
+        public Vector2 Dimensions { readonly get; private set; }
+        public Rectangle Rectangle
+        {
+            readonly get { return new(X, Y, Width, Height); }
+            private set { X = value.x; Y = value.y; Width = value.width; Height = value.height; }
+        }
+        public readonly bool Collides(Vector2 point)
+        {
+            return Raylib.CheckCollisionPointRec(point, Rectangle);
+        }
+        public readonly bool Collides(ICollider collider) => collider switch
+        {
+            RectangleCollider => ColliderExtensions.Collides(this, (RectangleCollider)collider),
+            CircleCollider => ColliderExtensions.Collides(this, (CircleCollider)collider),
+            _ => throw new Exception($"Cannot check collision between {this} and {collider}"),
+        };
+    }
+    public struct CircleCollider : ICollider, IPosition, ICircle
+    {
+        public float X { readonly get { return Position.X; } private set { Position = new(value, Position.Y); } }
+        public float Y { readonly get { return Position.Y; } private set { Position = new(Position.X, value); } }
+        [JsonInclude]
+        [JsonConverter(typeof(Vector2JsonConverter))]
+        public Vector2 Position { readonly get; private set; }
+        [JsonInclude]
+        public float Radius { readonly get; private set; }
+        public readonly bool Collides(Vector2 point)
+        {
+            return Raylib.CheckCollisionPointCircle(point, Position, Radius);
+        }
+        public readonly bool Collides(ICollider collider) => collider switch
+        {
+            RectangleCollider => ColliderExtensions.Collides((RectangleCollider)collider, this),
+            CircleCollider => ColliderExtensions.Collides(this, (CircleCollider)collider),
+            _ => throw new Exception($"Cannot check collision between {this} and {collider}"),
+        };
+    }
+    public static class ColliderExtensions
+    {
+        public static bool Collides(RectangleCollider collider1, RectangleCollider collider2)
+        {
+            return Raylib.CheckCollisionRecs(collider1.Rectangle, collider2.Rectangle);
+        }
+        public static bool Collides(CircleCollider collider1, CircleCollider collider2)
+        {
+            return Raylib.CheckCollisionCircles(collider1.Position, collider1.Radius, collider2.Position, collider2.Radius);
+        }
+        public static bool Collides(RectangleCollider collider1, CircleCollider collider2)
+        {
+            return Raylib.CheckCollisionCircleRec(collider2.Position, collider2.Radius, collider1.Rectangle);
+        }
     }
 }
