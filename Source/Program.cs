@@ -1,25 +1,26 @@
 ﻿using System;
 using System.Numerics;
+using System.Text.Json;
 using Raylib_cs;
-using static Raylib_cs.Raylib;
-using static Raylib_cs.Raymath;
-using static Raylib_cs.KeyboardKey;
 
-class Program
+namespace CityBuilder
 {
-    static void Main(string[] args)
+    class Program
     {
-        Raylib.InitWindow(800, 600, "Hello World!");
-
-        while (!Raylib.WindowShouldClose())
+        static void Main()
         {
-            Raylib.BeginDrawing();
-            Raylib.ClearBackground(Color.RAYWHITE);
+            Raylib.InitWindow(800, 600, "Hello World!");
 
-            Raylib.DrawText("Hello, world!", 12, 12, 20, Color.BLACK);
+            while (!Raylib.WindowShouldClose())
+            {
+                Raylib.BeginDrawing();
+                Raylib.ClearBackground(Color.RAYWHITE);
 
-            Raylib.EndDrawing();
+                Raylib.DrawText("Hello, world!", 12, 12, 20, Color.BLACK);
+
+                Raylib.EndDrawing();
+            }
+            Raylib.CloseWindow();
         }
-        Raylib.CloseWindow();
     }
 }
