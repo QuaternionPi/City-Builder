@@ -1,3 +1,18 @@
 {
-  "Position": { "X": 24, "Y": 56 }
+  "Map": {
+    "Cells": [
+      [
+        { "TopTile": { "Value": 1 }, "RightTile": { "Value": 2 }, "BottomTile": { "Value": 3 }, "LeftTile": { "Value": 4 } },
+        { "TopTile": { "Value": 1 }, "RightTile": { "Value": 2 }, "BottomTile": { "Value": 3 }, "LeftTile": { "Value": 4 } },
+        { "TopTile": { "Value": 1 }, "RightTile": { "Value": 2 }, "BottomTile": { "Value": 3 }, "LeftTile": { "Value": 4 } },
+        { "TopTile": { "Value": 1 }, "RightTile": { "Value": 2 }, "BottomTile": { "Value": 3 }, "LeftTile": { "Value": 4 } }
+      ],
+      [
+        { "TopTile": { "Value": 1 }, "RightTile": { "Value": 2 }, "BottomTile": { "Value": 3 }, "LeftTile": { "Value": 4 } },
+        { "TopTile": { "Value": 1 }, "RightTile": { "Value": 2 }, "BottomTile": { "Value": 3 }, "LeftTile": { "Value": 4 } },
+        { "TopTile": { "Value": 1 }, "RightTile": { "Value": 2 }, "BottomTile": { "Value": 3 }, "LeftTile": { "Value": 4 } },
+        { "TopTile": { "Value": 1 }, "RightTile": { "Value": 2 }, "BottomTile": { "Value": 3 }, "LeftTile": { "Value": 4 } }
+      ]
+    ]
+  }
 }
