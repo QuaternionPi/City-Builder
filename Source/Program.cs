@@ -13,9 +13,9 @@ namespace CityBuilder
             Raylib.SetTargetFPS(60);
             Raylib.InitWindow(800, 600, "Hello World!");
 
-            String text = File.ReadAllText("../Resources/Data/test.json");
-            Game game = Game.LoadGame(text);
-
+            //String text = File.ReadAllText("../Resources/Data/test.json");
+            //Game game = Game.LoadGame(text);
+            Game game = new Game(40, 30);
             while (!Raylib.WindowShouldClose())
             {
                 game.UpdateCycle();
