@@ -20,8 +20,10 @@ namespace CityBuilder
         protected String Text { get; set; }
         public bool Shown { get; }
         protected RectangleCollider MouseCollider { get; set; }
-        public event EventHandler? LeftClick;
-        public event EventHandler? RightClick;
+        public event EventHandler? LeftClicked;
+        public event EventHandler? RightClicked;
+        public event EventHandler? LeftDragged;
+        public event EventHandler? RightDragged;
         public float X { get { return Position.X; } protected set { Position = new(value, Position.Y); } }
         public float Y { get { return Position.Y; } protected set { Position = new(Position.X, value); } }
         public Vector2 Position { get; set; }
@@ -42,13 +44,21 @@ namespace CityBuilder
             Vector2 mousePosition = Raylib.GetMousePosition();
             return MouseCollider.Collides(mousePosition);
         }
-        public void OnLeftClick()
+        public void LeftClick()
         {
-            LeftClick?.Invoke(this, EventArgs.Empty);
+            LeftClicked?.Invoke(this, EventArgs.Empty);
         }
-        public void OnRightClick()
+        public void RightClick()
         {
-            RightClick?.Invoke(this, EventArgs.Empty);
+            RightClicked?.Invoke(this, EventArgs.Empty);
+        }
+        public void LeftDrag()
+        {
+            LeftDragged?.Invoke(this, EventArgs.Empty);
+        }
+        public void RightDrag()
+        {
+            RightDragged?.Invoke(this, EventArgs.Empty);
         }
         public void Initialize(GUIManager guiManager)
         {

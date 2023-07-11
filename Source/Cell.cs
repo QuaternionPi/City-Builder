@@ -41,10 +41,10 @@ namespace CityBuilder
             RightTile.Initialize(guiManager, Position, bottomRight, topRight);
             BottomTile.Initialize(guiManager, Position, bottomLeft, bottomRight);
             LeftTile.Initialize(guiManager, Position, topLeft, bottomLeft);
-            TopTile.LeftClick += PrintSomething;
-            RightTile.LeftClick += PrintSomething;
-            BottomTile.LeftClick += PrintSomething;
-            LeftTile.LeftClick += PrintSomething;
+            TopTile.LeftClicked += PrintSomething;
+            RightTile.LeftClicked += PrintSomething;
+            BottomTile.LeftClicked += PrintSomething;
+            LeftTile.LeftClicked += PrintSomething;
         }
         protected void PrintSomething(object? sender, EventArgs eventArgs)
         {

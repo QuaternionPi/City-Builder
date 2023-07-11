@@ -36,22 +36,36 @@ namespace CityBuilder
     }
     public interface IClickable : IMousable
     {
-        public void OnLeftClick();
-        public void OnRightClick();
-        public event EventHandler LeftClick;
-        public event EventHandler RightClick;
+        public event EventHandler? LeftClicked;
+        public event EventHandler? RightClicked;
+        public event EventHandler? LeftDragged;
+        public event EventHandler? RightDragged;
+        public void LeftClick();
+        public void RightClick();
+        public void LeftDrag();
+        public void RightDrag();
     }
     public static class ClickableExtensions
     {
-        public static void OnLeftClick(this IClickable clickable, object? sender, EventArgs eventArgs)
+        public static void LeftClick(this IClickable clickable, object? sender, EventArgs eventArgs)
         {
             if (clickable.IsMoused())
-                clickable.OnLeftClick();
+                clickable.LeftClick();
         }
-        public static void OnRightClick(this IClickable clickable, object? sender, EventArgs eventArgs)
+        public static void RightClick(this IClickable clickable, object? sender, EventArgs eventArgs)
         {
             if (clickable.IsMoused())
-                clickable.OnRightClick();
+                clickable.RightClick();
+        }
+        public static void LeftDrag(this IClickable clickable, object? sender, EventArgs eventArgs)
+        {
+            if (clickable.IsMoused())
+                clickable.LeftDrag();
+        }
+        public static void RightDrag(this IClickable clickable, object? sender, EventArgs eventArgs)
+        {
+            if (clickable.IsMoused())
+                clickable.RightDrag();
         }
     }
     public class GUIManager
@@ -76,22 +90,24 @@ namespace CityBuilder
             GUILayers[layer].Attach(attachee);
             if (attachee is IClickable clickable)
             {
-                clickable.LeftClick += StopClickPropagation;
-                clickable.RightClick += StopClickPropagation;
+                clickable.LeftClicked += StopClickPropagation;
+                clickable.RightClicked += StopClickPropagation;
+                clickable.LeftDragged += StopClickPropagation;
+                clickable.RightDragged += StopClickPropagation;
             }
         }
         public void RenderCycle()
         {
             for (int i = 0; i < Layers; i++)
             {
-                GUILayers[i].RenderCycle();
+                GUILayers[i].Render();
             }
         }
         public void UpdateCycle()
         {
             for (int i = 0; i < Layers; i++)
             {
-                GUILayers[i].UpdateCycle();
+                GUILayers[i].Update();
             }
         }
         public void ClickCycle()
@@ -107,38 +123,74 @@ namespace CityBuilder
         {
             SomethingClicked = true;
         }
-        protected class GUILayer
+        protected class GUILayer : IRenderable, IUpdatable, IClickable
         {
-            protected event EventHandler? Render;
-            protected event EventHandler? Update;
-            protected event EventHandler? LeftClick;
-            protected event EventHandler? RightClick;
+            public GUILayer()
+            {
+                Shown = true;
+                Active = true;
+            }
+            public bool Shown { get; }
+            public bool Active { get; }
+            public event EventHandler? LeftClicked;
+            public event EventHandler? RightClicked;
+            public event EventHandler? LeftDragged;
+            public event EventHandler? RightDragged;
+            protected event EventHandler? RenderEvent;
+            protected event EventHandler? UpdateEvent;
+            protected event EventHandler? LeftClickEvent;
+            protected event EventHandler? RightClickEvent;
+            protected event EventHandler? LeftDragEvent;
+            protected event EventHandler? RightDragEvent;
             public void Attach(object attachee)
             {
                 if (attachee is IRenderable renderable)
-                    Render += renderable.Render;
+                    RenderEvent += renderable.Render;
                 if (attachee is IUpdatable updatable)
-                    Update += updatable.Update;
+                    UpdateEvent += updatable.Update;
                 if (attachee is IClickable clickable)
                 {
-                    LeftClick += clickable.OnLeftClick;
-                    RightClick += clickable.OnRightClick;
+                    LeftClickEvent += clickable.LeftClick;
+                    RightClickEvent += clickable.RightClick;
+                    LeftDragEvent += clickable.LeftDrag;
+                    RightDragEvent += clickable.RightDrag;
                 }
             }
-            public void RenderCycle()
+            public void Render()
             {
-                Render?.Invoke(this, EventArgs.Empty);
+                RenderEvent?.Invoke(this, EventArgs.Empty);
             }
-            public void UpdateCycle()
+            public void Update()
             {
-                Update?.Invoke(this, EventArgs.Empty);
+                UpdateEvent?.Invoke(this, EventArgs.Empty);
+            }
+            public bool IsMoused() => true;
+            public void LeftClick()
+            {
+                LeftClickEvent?.Invoke(this, EventArgs.Empty);
+            }
+            public void RightClick()
+            {
+                RightClickEvent?.Invoke(this, EventArgs.Empty);
+            }
+            public void LeftDrag()
+            {
+                LeftDragEvent?.Invoke(this, EventArgs.Empty);
+            }
+            public void RightDrag()
+            {
+                RightDragEvent?.Invoke(this, EventArgs.Empty);
             }
             public void ClickCycle()
             {
                 if (Raylib.IsMouseButtonReleased(MouseButton.MOUSE_BUTTON_LEFT))
-                    LeftClick?.Invoke(this, EventArgs.Empty);
+                    LeftClick();
                 if (Raylib.IsMouseButtonReleased(MouseButton.MOUSE_BUTTON_RIGHT))
-                    RightClick?.Invoke(this, EventArgs.Empty);
+                    RightClick();
+                if (Raylib.IsMouseButtonDown(MouseButton.MOUSE_BUTTON_LEFT))
+                    LeftDrag();
+                if (Raylib.IsMouseButtonDown(MouseButton.MOUSE_BUTTON_RIGHT))
+                    RightDrag();
             }
         }
     }
