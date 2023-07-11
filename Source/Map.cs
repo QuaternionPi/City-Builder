@@ -9,7 +9,7 @@ namespace CityBuilder
     public class Map
     {
         public Map() { Cells = new Cell[1][]; Cells[0] = new Cell[1]; }
-        public static readonly int CellSize = 20;
+        public static readonly int CellSize = 40;
         [JsonInclude]
         public Cell[][] Cells { get; private set; }
         public void Initialize(
@@ -21,7 +21,9 @@ namespace CityBuilder
             for (int i = 0; i < Cells.Length; i++) for (int j = 0; j < Cells[i].Length; j++)
                 {
                     Cell cell = Cells[i][j];
-                    Vector2 position = new(CellSize * i, CellSize * j);
+                    int x = (int)(CellSize * (i + 0.5));
+                    int y = (int)(CellSize * (j + 0.5));
+                    Vector2 position = new(x, y);
                     Vector2 dimensions = new(CellSize, CellSize);
                     cell.Initialize(ref Render, ref Update, ref LeftClick, ref RightClick, position, dimensions);
                 }

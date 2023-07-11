@@ -15,7 +15,7 @@ namespace CityBuilder
 
             //String text = File.ReadAllText("../Resources/Data/test.json");
             //Game game = Game.LoadGame(text);
-            Game game = new Game(40, 30);
+            Game game = new Game(20, 15);
             while (!Raylib.WindowShouldClose())
             {
                 game.UpdateCycle();

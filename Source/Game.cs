@@ -23,6 +23,12 @@ namespace CityBuilder
         public void Initialize()
         {
             Map.Initialize(ref Render, ref Update, ref LeftClick, ref RightClick);
+            Button setWater = new Button(new(150, 50), new(250, 40), "Water");
+            Button setFlat = new Button(new(150, 100), new(250, 40), "Flat");
+            Button setHills = new Button(new(150, 150), new(250, 40), "Hills");
+            setWater.Initialize(ref Render, ref Update, ref LeftClick, ref RightClick);
+            setFlat.Initialize(ref Render, ref Update, ref LeftClick, ref RightClick);
+            setHills.Initialize(ref Render, ref Update, ref LeftClick, ref RightClick);
         }
         public void UpdateCycle()
         {
