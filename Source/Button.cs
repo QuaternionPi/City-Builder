@@ -14,6 +14,7 @@ namespace CityBuilder
             Shown = true;
             Position = position;
             Dimensions = dimensions;
+            MouseCollider = new RectangleCollider(position, dimensions);
             Text = text;
         }
         protected String Text { get; set; }
@@ -29,7 +30,8 @@ namespace CityBuilder
         public Vector2 Dimensions { get; set; }
         public void Render()
         {
-            Raylib.DrawRectangle((int)(X - Width / 2), (int)(Y - Height / 2), (int)Width, (int)Height, new Color(255, 255, 255, 55));
+            Color boxColor = IsMoused() ? new Color(255, 255, 255, 125) : new Color(255, 255, 255, 55);
+            Raylib.DrawRectangle((int)(X - Width / 2), (int)(Y - Height / 2), (int)Width, (int)Height, boxColor);
             Vector2 textDimensions = Raylib.MeasureTextEx(Raylib.GetFontDefault(), Text, 20, 1);
             float x = X - textDimensions.X / 2;
             float y = Y - textDimensions.Y / 2;
@@ -42,21 +44,15 @@ namespace CityBuilder
         }
         public void OnLeftClick()
         {
-
+            LeftClick?.Invoke(this, EventArgs.Empty);
         }
         public void OnRightClick()
         {
-
+            RightClick?.Invoke(this, EventArgs.Empty);
         }
-        public void Initialize(
-            ref EventHandler? Render,
-            ref EventHandler? Update,
-            ref EventHandler? LeftClick,
-            ref EventHandler? RightClick)
+        public void Initialize(GUIManager guiManager)
         {
-            Render += this.Render;
-            LeftClick += this.OnLeftClick;
-            RightClick += this.OnRightClick;
+            guiManager.Attach(this, 3);
         }
     }
 }

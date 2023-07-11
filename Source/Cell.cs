@@ -29,13 +29,7 @@ namespace CityBuilder
         public float Width { get { return Dimensions.X; } protected set { Dimensions = new(value, Dimensions.Y); } }
         public float Height { get { return Dimensions.Y; } protected set { Dimensions = new(Dimensions.X, value); } }
         public Vector2 Dimensions { get; set; }
-        public void Initialize(
-            ref EventHandler? Render,
-            ref EventHandler? Update,
-            ref EventHandler? LeftClick,
-            ref EventHandler? RightClick,
-            Vector2 position,
-            Vector2 dimensions)
+        public void Initialize(GUIManager guiManager, Vector2 position, Vector2 dimensions)
         {
             Position += position;
             Dimensions += dimensions;
@@ -43,10 +37,10 @@ namespace CityBuilder
             Vector2 topRight = Position + new Vector2(Width / 2, -Height / 2);
             Vector2 bottomRight = Position + Dimensions / 2;
             Vector2 bottomLeft = Position + new Vector2(-Width / 2, Height / 2);
-            TopTile.Initialize(ref Render, ref Update, ref LeftClick, ref RightClick, Position, topRight, topLeft);
-            RightTile.Initialize(ref Render, ref Update, ref LeftClick, ref RightClick, Position, bottomRight, topRight);
-            BottomTile.Initialize(ref Render, ref Update, ref LeftClick, ref RightClick, Position, bottomLeft, bottomRight);
-            LeftTile.Initialize(ref Render, ref Update, ref LeftClick, ref RightClick, Position, topLeft, bottomLeft);
+            TopTile.Initialize(guiManager, Position, topRight, topLeft);
+            RightTile.Initialize(guiManager, Position, bottomRight, topRight);
+            BottomTile.Initialize(guiManager, Position, bottomLeft, bottomRight);
+            LeftTile.Initialize(guiManager, Position, topLeft, bottomLeft);
             TopTile.LeftClick += PrintSomething;
             RightTile.LeftClick += PrintSomething;
             BottomTile.LeftClick += PrintSomething;

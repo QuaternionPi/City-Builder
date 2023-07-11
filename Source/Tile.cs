@@ -51,8 +51,7 @@ namespace CityBuilder
         }
         public void Update()
         {
-            if (Raylib.IsMouseButtonDown(MouseButton.MOUSE_BUTTON_LEFT) && IsMoused())
-                Terrain = Terrain.Flat;
+
         }
         public bool IsMoused()
         {
@@ -61,28 +60,19 @@ namespace CityBuilder
         }
         public void OnLeftClick()
         {
+            Terrain = Terrain.Flat;
             LeftClick?.Invoke(this, EventArgs.Empty);
         }
         public void OnRightClick()
         {
             RightClick?.Invoke(this, EventArgs.Empty);
         }
-        public void Initialize(
-            ref EventHandler? Render,
-            ref EventHandler? Update,
-            ref EventHandler? LeftClick,
-            ref EventHandler? RightClick,
-            Vector2 point1,
-            Vector2 point2,
-            Vector2 point3)
+        public void Initialize(GUIManager guiManager, Vector2 point1, Vector2 point2, Vector2 point3)
         {
             Point1 = point1;
             Point2 = point2;
             Point3 = point3;
-            Render += this.Render;
-            Update += this.Update;
-            LeftClick += this.OnLeftClick;
-            RightClick += this.OnRightClick;
+            guiManager.Attach(this, 1);
         }
     }
     public static class TerrainExtensions

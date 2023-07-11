@@ -37,7 +37,7 @@ namespace CityBuilder
         public Vector2 Dimensions { readonly get; private set; }
         public Rectangle Rectangle
         {
-            readonly get { return new(X, Y, Width, Height); }
+            readonly get { return new(X - Width / 2, Y - Height / 2, Width, Height); }
             private set { X = value.x; Y = value.y; Width = value.width; Height = value.height; }
         }
         public readonly bool Collides(Vector2 point)

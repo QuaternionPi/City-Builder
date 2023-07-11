@@ -15,10 +15,11 @@ namespace CityBuilder
 
             //String text = File.ReadAllText("../Resources/Data/test.json");
             //Game game = Game.LoadGame(text);
-            Game game = new Game(20, 15);
+            Game game = new(20, 15);
             while (!Raylib.WindowShouldClose())
             {
                 game.UpdateCycle();
+                game.ClickCycle();
                 Raylib.BeginDrawing();
                 Raylib.ClearBackground(Color.RAYWHITE);
 

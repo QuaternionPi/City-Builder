@@ -12,11 +12,7 @@ namespace CityBuilder
         public static readonly int CellSize = 40;
         [JsonInclude]
         public Cell[][] Cells { get; private set; }
-        public void Initialize(
-            ref EventHandler? Render,
-            ref EventHandler? Update,
-            ref EventHandler? LeftClick,
-            ref EventHandler? RightClick)
+        public void Initialize(GUIManager guiManager)
         {
             for (int i = 0; i < Cells.Length; i++) for (int j = 0; j < Cells[i].Length; j++)
                 {
@@ -25,7 +21,7 @@ namespace CityBuilder
                     int y = (int)(CellSize * (j + 0.5));
                     Vector2 position = new(x, y);
                     Vector2 dimensions = new(CellSize, CellSize);
-                    cell.Initialize(ref Render, ref Update, ref LeftClick, ref RightClick, position, dimensions);
+                    cell.Initialize(guiManager, position, dimensions);
                 }
         }
         public Map(int x, int y)

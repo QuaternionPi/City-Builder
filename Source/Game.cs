@@ -8,39 +8,41 @@ namespace CityBuilder
 {
     public class Game
     {
-        public Game() { Map = new Map(); }
+        public Game()
+        {
+            Map = new Map();
+            GUIManager = new(5);
+        }
         public Game(int x, int y)
         {
             Map = new Map(x, y);
+            GUIManager = new(5);
             Initialize();
         }
         [JsonInclude]
         public Map Map { get; private set; }
-        protected event EventHandler? Render;
-        protected event EventHandler? Update;
-        protected event EventHandler? LeftClick;
-        protected event EventHandler? RightClick;
+        public GUIManager GUIManager { get; private set; }
         public void Initialize()
         {
-            Map.Initialize(ref Render, ref Update, ref LeftClick, ref RightClick);
-            Button setWater = new Button(new(150, 50), new(250, 40), "Water");
-            Button setFlat = new Button(new(150, 100), new(250, 40), "Flat");
-            Button setHills = new Button(new(150, 150), new(250, 40), "Hills");
-            setWater.Initialize(ref Render, ref Update, ref LeftClick, ref RightClick);
-            setFlat.Initialize(ref Render, ref Update, ref LeftClick, ref RightClick);
-            setHills.Initialize(ref Render, ref Update, ref LeftClick, ref RightClick);
-        }
-        public void UpdateCycle()
-        {
-            Update?.Invoke(this, EventArgs.Empty);
-            if (Raylib.IsMouseButtonReleased(MouseButton.MOUSE_BUTTON_LEFT))
-                LeftClick?.Invoke(this, EventArgs.Empty);
-            if (Raylib.IsMouseButtonReleased(MouseButton.MOUSE_BUTTON_RIGHT))
-                RightClick?.Invoke(this, EventArgs.Empty);
+            Map.Initialize(GUIManager);
+            Button setWater = new(new(150, 50), new(250, 40), "Water");
+            Button setFlat = new(new(150, 100), new(250, 40), "Flat");
+            Button setHills = new(new(150, 150), new(250, 40), "Hills");
+            setWater.Initialize(GUIManager);
+            setFlat.Initialize(GUIManager);
+            setHills.Initialize(GUIManager);
         }
         public void RenderCycle()
         {
-            Render?.Invoke(this, EventArgs.Empty);
+            GUIManager.RenderCycle();
+        }
+        public void UpdateCycle()
+        {
+            GUIManager.UpdateCycle();
+        }
+        public void ClickCycle()
+        {
+            GUIManager.ClickCycle();
         }
         public static Game LoadGame(String json)
         {
