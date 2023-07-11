@@ -18,6 +18,7 @@ namespace CityBuilder
 
             while (!Raylib.WindowShouldClose())
             {
+                game.UpdateCycle();
                 Raylib.BeginDrawing();
                 Raylib.ClearBackground(Color.RAYWHITE);
 

@@ -6,6 +6,9 @@ using Raylib_cs;
 
 namespace CityBuilder
 {
+    [JsonDerivedType(typeof(RectangleCollider), typeDiscriminator: "Rectangle")]
+    [JsonDerivedType(typeof(CircleCollider), typeDiscriminator: "Circle")]
+    [JsonDerivedType(typeof(TriangleCollider), typeDiscriminator: "Triangle")]
     public interface ICollider
     {
         public bool Collides(Vector2 point);
@@ -72,6 +75,12 @@ namespace CityBuilder
     }
     public struct TriangleCollider : ICollider, ITriangle
     {
+        public TriangleCollider(Vector2 point1, Vector2 point2, Vector2 point3)
+        {
+            Point1 = point1;
+            Point2 = point2;
+            Point3 = point3;
+        }
         public float X { readonly get { return Position.X; } private set { Position = new(value, Position.Y); } }
         public float Y { readonly get { return Position.Y; } private set { Position = new(Position.X, value); } }
         public Vector2 Position

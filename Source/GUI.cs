@@ -44,11 +44,13 @@ namespace CityBuilder
     {
         public static void OnLeftClick(this IClickable clickable, object? sender, EventArgs eventArgs)
         {
-            clickable.OnLeftClick();
+            if (clickable.IsMoused())
+                clickable.OnLeftClick();
         }
         public static void OnRightClick(this IClickable clickable, object? sender, EventArgs eventArgs)
         {
-            clickable.OnRightClick();
+            if (clickable.IsMoused())
+                clickable.OnRightClick();
         }
     }
 }
