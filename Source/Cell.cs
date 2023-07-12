@@ -23,6 +23,7 @@ namespace CityBuilder
         public Tile BottomTile { get; set; }
         [JsonInclude]
         public Tile LeftTile { get; set; }
+        public event EventHandler<TileClickedArgs>? TileLeftClicked;
         public event EventHandler<TileClickedArgs>? TileLeftDragged;
         public float X { get { return Position.X; } protected set { Position = new(value, Position.Y); } }
         public float Y { get { return Position.Y; } protected set { Position = new(Position.X, value); } }
@@ -34,18 +35,36 @@ namespace CityBuilder
         {
             Position += position;
             Dimensions += dimensions;
+
             Vector2 topLeft = Position - Dimensions / 2;
             Vector2 topRight = Position + new Vector2(Width / 2, -Height / 2);
             Vector2 bottomRight = Position + Dimensions / 2;
             Vector2 bottomLeft = Position + new Vector2(-Width / 2, Height / 2);
+
             TopTile.Initialize(guiManager, Position, topRight, topLeft);
             RightTile.Initialize(guiManager, Position, bottomRight, topRight);
             BottomTile.Initialize(guiManager, Position, bottomLeft, bottomRight);
             LeftTile.Initialize(guiManager, Position, topLeft, bottomLeft);
+
+            TopTile.LeftClicked += TileLeftClick;
+            RightTile.LeftClicked += TileLeftClick;
+            BottomTile.LeftClicked += TileLeftClick;
+            LeftTile.LeftClicked += TileLeftClick;
+
             TopTile.LeftDragged += TileLeftDrag;
             RightTile.LeftDragged += TileLeftDrag;
             BottomTile.LeftDragged += TileLeftDrag;
             LeftTile.LeftDragged += TileLeftDrag;
+        }
+        protected void TileLeftClick(object? sender, EventArgs eventArgs) => TileLeftClick(sender);
+        protected void TileLeftClick(object? sender)
+        {
+            if (sender is not Tile tile)
+            {
+                throw new Exception();
+            }
+            TileClickedArgs args = new(tile);
+            TileLeftClicked?.Invoke(this, args);
         }
         protected void TileLeftDrag(object? sender, EventArgs eventArgs) => TileLeftDrag(sender);
         protected void TileLeftDrag(object? sender)

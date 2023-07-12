@@ -28,12 +28,15 @@ namespace CityBuilder
             Button setWater = new(new(150, 50), new(250, 40), "Water");
             Button setFlat = new(new(150, 100), new(250, 40), "Flat");
             Button setHills = new(new(150, 150), new(250, 40), "Hills");
+            Button setDrawLine = new(new(150, 200), new(250, 40), "Draw Line");
             setWater.Initialize(GUIManager);
             setFlat.Initialize(GUIManager);
             setHills.Initialize(GUIManager);
+            setDrawLine.Initialize(GUIManager);
             setWater.LeftClicked += SetMapPaintTerrainWater;
             setFlat.LeftClicked += SetMapPaintTerrainFlat;
             setHills.LeftClicked += SetMapPaintTerrainHills;
+            setDrawLine.LeftClicked += SetMapDrawLine;
         }
         public void RenderCycle()
         {
@@ -64,6 +67,10 @@ namespace CityBuilder
         public void SetMapPaintTerrainHills(object? sender, EventArgs eventArgs)
         {
             Map.PaintTerrain = Terrain.Hills;
+        }
+        public void SetMapDrawLine(object? sender, EventArgs eventArgs)
+        {
+            Map.Mode = MapMode.DrawLine;
         }
     }
 }
