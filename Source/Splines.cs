@@ -7,9 +7,9 @@ using Raylib_cs;
 
 namespace CityBuilder
 {
-    public class Line : IRenderable
+    public class LineSegment : IRenderable
     {
-        public Line()
+        public LineSegment()
         {
             Shown = true;
         }

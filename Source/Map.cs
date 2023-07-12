@@ -14,7 +14,7 @@ namespace CityBuilder
             Cells = new Cell[1][];
             Cells[0] = new Cell[1];
             PaintTerrain = Terrain.Flat;
-            Line = new Line();
+            LineSegment = new LineSegment();
         }
         public Map(int x, int y)
         {
@@ -27,7 +27,7 @@ namespace CityBuilder
                     Cells[i][j] = new Cell();
                 }
             }
-            Line = new Line();
+            LineSegment = new LineSegment();
         }
         public static readonly int CellSize = 40;
         [JsonInclude]
@@ -35,7 +35,7 @@ namespace CityBuilder
         public MapMode Mode { get; set; }
         protected Terrain Terrain;
         public Terrain PaintTerrain { get { return Terrain; } set { Terrain = value; Mode = MapMode.PaintTerrain; } }
-        protected Line Line;
+        protected LineSegment LineSegment;
         public void Initialize(GUIManager guiManager)
         {
             for (int i = 0; i < Cells.Length; i++)
@@ -50,12 +50,12 @@ namespace CityBuilder
                     cell.TileLeftClicked += TileLeftClick;
                     cell.TileLeftDragged += TileLeftDrag;
                 }
-            Line.Initialize(guiManager);
+            LineSegment.Initialize(guiManager);
         }
         protected void TileLeftClick(object? sender, TileClickedArgs args)
         {
             if (Mode == MapMode.DrawLine)
-                Line.StartPosition = Raylib.GetMousePosition();
+                LineSegment.StartPosition = Raylib.GetMousePosition();
         }
         protected void TileLeftDrag(object? sender, TileClickedArgs args)
         {
@@ -70,7 +70,7 @@ namespace CityBuilder
         }
         protected void DrawLine()
         {
-            Line.EndPosition = Raylib.GetMousePosition();
+            LineSegment.EndPosition = Raylib.GetMousePosition();
         }
     }
 }

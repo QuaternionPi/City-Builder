@@ -11,7 +11,8 @@ namespace CityBuilder
         static void Main()
         {
             Raylib.SetTargetFPS(60);
-            Raylib.InitWindow(800, 600, "Hello World!");
+            Raylib.SetConfigFlags(ConfigFlags.FLAG_MSAA_4X_HINT);
+            Raylib.InitWindow(800, 600, "City Builder");
 
             //String text = File.ReadAllText("../Resources/Data/test.json");
             //Game game = Game.LoadGame(text);
