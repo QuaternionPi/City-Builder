@@ -31,6 +31,9 @@ namespace CityBuilder
             setWater.Initialize(GUIManager);
             setFlat.Initialize(GUIManager);
             setHills.Initialize(GUIManager);
+            setWater.LeftClicked += SetMapPaintTerrainWater;
+            setFlat.LeftClicked += SetMapPaintTerrainFlat;
+            setHills.LeftClicked += SetMapPaintTerrainHills;
         }
         public void RenderCycle()
         {
@@ -49,6 +52,18 @@ namespace CityBuilder
             Game game = JsonSerializer.Deserialize<Game>(json) ?? throw new Exception();
             game.Initialize();
             return game;
+        }
+        public void SetMapPaintTerrainWater(object? sender, EventArgs eventArgs)
+        {
+            Map.PaintTerrain = Terrain.Water;
+        }
+        public void SetMapPaintTerrainFlat(object? sender, EventArgs eventArgs)
+        {
+            Map.PaintTerrain = Terrain.Flat;
+        }
+        public void SetMapPaintTerrainHills(object? sender, EventArgs eventArgs)
+        {
+            Map.PaintTerrain = Terrain.Hills;
         }
     }
 }

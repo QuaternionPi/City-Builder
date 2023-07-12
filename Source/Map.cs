@@ -12,6 +12,7 @@ namespace CityBuilder
         {
             Cells = new Cell[1][];
             Cells[0] = new Cell[1];
+            PaintTerrain = Terrain.Flat;
         }
         public Map(int x, int y)
         {
@@ -28,6 +29,7 @@ namespace CityBuilder
         public static readonly int CellSize = 40;
         [JsonInclude]
         public Cell[][] Cells { get; private set; }
+        public Terrain PaintTerrain { get; set; }
         public void Initialize(GUIManager guiManager)
         {
             for (int i = 0; i < Cells.Length; i++)
@@ -45,7 +47,7 @@ namespace CityBuilder
         protected void Paint(object? sender, TileClickedArgs tileClickedArgs)
         {
             Tile tile = tileClickedArgs.Tile;
-            tile.ChangeTerrain(Terrain.Flat, Raylib.GetMousePosition());
+            tile.ChangeTerrain(PaintTerrain, Raylib.GetMousePosition());
         }
     }
 }
