@@ -23,6 +23,7 @@ namespace CityBuilder
         public Tile BottomTile { get; set; }
         [JsonInclude]
         public Tile LeftTile { get; set; }
+        public event EventHandler<TileClickedArgs>? TileLeftDragged;
         public float X { get { return Position.X; } protected set { Position = new(value, Position.Y); } }
         public float Y { get { return Position.Y; } protected set { Position = new(Position.X, value); } }
         public Vector2 Position { get; set; }
@@ -41,14 +42,28 @@ namespace CityBuilder
             RightTile.Initialize(guiManager, Position, bottomRight, topRight);
             BottomTile.Initialize(guiManager, Position, bottomLeft, bottomRight);
             LeftTile.Initialize(guiManager, Position, topLeft, bottomLeft);
-            TopTile.LeftClicked += PrintSomething;
-            RightTile.LeftClicked += PrintSomething;
-            BottomTile.LeftClicked += PrintSomething;
-            LeftTile.LeftClicked += PrintSomething;
+            TopTile.LeftDragged += TileLeftDrag;
+            RightTile.LeftDragged += TileLeftDrag;
+            BottomTile.LeftDragged += TileLeftDrag;
+            LeftTile.LeftDragged += TileLeftDrag;
         }
-        protected void PrintSomething(object? sender, EventArgs eventArgs)
+        protected void TileLeftDrag(object? sender, EventArgs eventArgs) => TileLeftDrag(sender);
+        protected void TileLeftDrag(object? sender)
         {
-            Console.WriteLine("Something");
+            if (sender is not Tile tile)
+            {
+                throw new Exception();
+            }
+            TileClickedArgs args = new(tile);
+            TileLeftDragged?.Invoke(this, args);
         }
+    }
+    public class TileClickedArgs : EventArgs
+    {
+        public TileClickedArgs(Tile tile)
+        {
+            Tile = tile;
+        }
+        public readonly Tile Tile;
     }
 }

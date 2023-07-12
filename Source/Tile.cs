@@ -70,7 +70,6 @@ namespace CityBuilder
         }
         public void LeftDrag()
         {
-            Terrain = Terrain.Flat;
             LeftDragged?.Invoke(this, EventArgs.Empty);
         }
         public void RightDrag()
@@ -83,6 +82,20 @@ namespace CityBuilder
             Point2 = point2;
             Point3 = point3;
             guiManager.Attach(this, 1);
+        }
+        public void ChangeTerrain(Terrain terrain, Vector2 point)
+        {
+            if (MouseCollider.Collides(point))
+                ChangeTerrain(terrain);
+        }
+        public void ChangeTerrain(Terrain terrain, ICollider collider)
+        {
+            if (MouseCollider.Collides(collider))
+                ChangeTerrain(terrain);
+        }
+        protected void ChangeTerrain(Terrain terrain)
+        {
+            Terrain = terrain;
         }
     }
     public static class TerrainExtensions
