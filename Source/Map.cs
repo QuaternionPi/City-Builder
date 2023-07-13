@@ -7,7 +7,7 @@ using Raylib_cs;
 namespace CityBuilder
 {
     public enum MapMode { PaintTerrain, DrawLine }
-    public class Map
+    public class Map : IRenderable
     {
         public Map()
         {
@@ -15,6 +15,8 @@ namespace CityBuilder
             Cells[0] = new Cell[1];
             PaintTerrain = Terrain.Flat;
             LineSegment = new LineSegment();
+            Line = new Line<LineSegment>();
+            Shown = true;
         }
         public Map(int x, int y)
         {
@@ -28,7 +30,10 @@ namespace CityBuilder
                 }
             }
             LineSegment = new LineSegment();
+            Line = new Line<LineSegment>();
+            Shown = true;
         }
+        public bool Shown { get; }
         public static readonly int CellSize = 40;
         [JsonInclude]
         public Cell[][] Cells { get; private set; }
@@ -36,6 +41,13 @@ namespace CityBuilder
         protected Terrain Terrain;
         public Terrain PaintTerrain { get { return Terrain; } set { Terrain = value; Mode = MapMode.PaintTerrain; } }
         protected LineSegment LineSegment;
+        protected Line<LineSegment> Line;
+        public void Render()
+        {
+            LineSegment.EndPosition = Raylib.GetMousePosition();
+            if (LineSegment.StartPosition != Vector2.Zero)
+                LineSegment.Render();
+        }
         public void Initialize(GUIManager guiManager)
         {
             for (int i = 0; i < Cells.Length; i++)
@@ -50,27 +62,42 @@ namespace CityBuilder
                     cell.TileLeftClicked += TileLeftClick;
                     cell.TileLeftDragged += TileLeftDrag;
                 }
-            LineSegment.Initialize(guiManager);
+            Line.Initialize(guiManager);
+            guiManager.Attach(this, 1);
         }
         protected void TileLeftClick(object? sender, TileClickedArgs args)
         {
+            if (sender is not Cell cell) throw new Exception();
             if (Mode == MapMode.DrawLine)
-                LineSegment.StartPosition = Raylib.GetMousePosition();
+                DrawLine(cell.Position);
         }
         protected void TileLeftDrag(object? sender, TileClickedArgs args)
         {
             if (Mode == MapMode.PaintTerrain)
                 Paint(args.Tile);
-            else if (Mode == MapMode.DrawLine)
-                DrawLine();
         }
         protected void Paint(Tile tile)
         {
             tile.ChangeTerrain(PaintTerrain, Raylib.GetMousePosition());
         }
-        protected void DrawLine()
+        protected void DrawLine(Vector2 position)
         {
-            LineSegment.EndPosition = Raylib.GetMousePosition();
+            if ((Line.Connects(LineSegment) == false) || LineSegment.StartPosition == Vector2.Zero)
+            {
+                LineSegment = new LineSegment
+                {
+                    StartPosition = position
+                };
+            }
+            else
+            {
+                LineSegment.EndPosition = position;
+                if (LineSegment.Length < 1.5 * CellSize)
+                {
+                    Line.AddLine(LineSegment);
+                    LineSegment = new LineSegment();
+                }
+            }
         }
     }
 }
