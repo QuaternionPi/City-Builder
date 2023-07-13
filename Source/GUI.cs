@@ -18,6 +18,10 @@ namespace CityBuilder
             element.GUIManager = guiManager;
             guiManager.Attach(element, element.GUILayer);
         }
+        public static void DetachGUI(this IGUIElement element)
+        {
+            element.GUIManager?.Detach(element);
+        }
     }
     public interface IRenderable
     {
@@ -109,6 +113,13 @@ namespace CityBuilder
                 clickable.RightDragged += StopClickPropagation;
             }
         }
+        public void Detach(IGUIElement detachee)
+        {
+            foreach (GUILayer layer in GUILayers)
+            {
+                layer.Detach(detachee);
+            }
+        }
         public void RenderCycle()
         {
             for (int i = 0; i < Layers; i++)
@@ -155,7 +166,7 @@ namespace CityBuilder
             protected event EventHandler? RightClickEvent;
             protected event EventHandler? LeftDragEvent;
             protected event EventHandler? RightDragEvent;
-            public void Attach(object attachee)
+            public void Attach(IGUIElement attachee)
             {
                 if (attachee is IRenderable renderable)
                     RenderEvent += renderable.Render;
@@ -167,6 +178,20 @@ namespace CityBuilder
                     RightClickEvent += clickable.RightClick;
                     LeftDragEvent += clickable.LeftDrag;
                     RightDragEvent += clickable.RightDrag;
+                }
+            }
+            public void Detach(IGUIElement detachee)
+            {
+                if (detachee is IRenderable renderable)
+                    RenderEvent -= renderable.Render;
+                if (detachee is IUpdatable updatable)
+                    UpdateEvent -= updatable.Update;
+                if (detachee is IClickable clickable)
+                {
+                    LeftClickEvent -= clickable.LeftClick;
+                    RightClickEvent -= clickable.RightClick;
+                    LeftDragEvent -= clickable.LeftDrag;
+                    RightDragEvent -= clickable.RightDrag;
                 }
             }
             public void Render()
