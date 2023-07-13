@@ -6,6 +6,19 @@ using Raylib_cs;
 
 namespace CityBuilder
 {
+    public interface IGUIElement
+    {
+        public GUIManager? GUIManager { get; set; }
+        public int GUILayer { get; }
+    }
+    public static class GUIElementExtensions
+    {
+        public static void AttachGUI(this IGUIElement element, GUIManager guiManager)
+        {
+            element.GUIManager = guiManager;
+            guiManager.Attach(element, element.GUILayer);
+        }
+    }
     public interface IRenderable
     {
         public void Render();
@@ -81,7 +94,7 @@ namespace CityBuilder
         public int Layers { get { return GUILayers.Length; } }
         protected GUILayer[] GUILayers;
         protected bool SomethingClicked;
-        public void Attach(object attachee, int layer)
+        public void Attach(IGUIElement attachee, int layer)
         {
             if (layer < 0)
                 throw new IndexOutOfRangeException("Layer Cannot be less than 0");

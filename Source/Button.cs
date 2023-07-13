@@ -7,17 +7,20 @@ using Raylib_cs;
 
 namespace CityBuilder
 {
-    public class Button : IRenderable, IClickable, IRectangle
+    public class Button : IGUIElement, IRenderable, IClickable, IRectangle
     {
         public Button(Vector2 position, Vector2 dimensions, String text)
         {
             Shown = true;
+            GUILayer = 4;
             Position = position;
             Dimensions = dimensions;
             MouseCollider = new RectangleCollider(position, dimensions);
             Text = text;
         }
         protected String Text { get; set; }
+        public GUIManager? GUIManager { get; set; }
+        public int GUILayer { get; }
         public bool Shown { get; }
         protected RectangleCollider MouseCollider { get; set; }
         public event EventHandler? LeftClicked;
@@ -62,7 +65,7 @@ namespace CityBuilder
         }
         public void Initialize(GUIManager guiManager)
         {
-            guiManager.Attach(this, 3);
+            this.AttachGUI(guiManager);
         }
     }
 }

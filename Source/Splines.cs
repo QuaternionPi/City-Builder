@@ -30,20 +30,19 @@ namespace CityBuilder
         {
             Raylib.DrawLineEx(StartPosition, EndPosition, Thickness, Color.BLACK);
         }
-        public void Initialize(GUIManager guiManager)
-        {
-            guiManager.Attach(this, 3);
-        }
     }
-    public class Line<Segment> : IRenderable where Segment : ISpline
+    public class Line<Segment> : IGUIElement, IRenderable where Segment : ISpline
     {
         public Line()
         {
             Shown = true;
+            GUILayer = 3;
             Segments = new List<Segment>();
         }
-        public bool Shown { get; }
         protected List<Segment> Segments;
+        public GUIManager? GUIManager { get; set; }
+        public int GUILayer { get; }
+        public bool Shown { get; }
         public void Render()
         {
             foreach (Segment segment in Segments)
@@ -53,7 +52,7 @@ namespace CityBuilder
         }
         public void Initialize(GUIManager guiManager)
         {
-            guiManager.Attach(this, 3);
+            this.AttachGUI(guiManager);
         }
         public bool Connects(Segment segment)
         {

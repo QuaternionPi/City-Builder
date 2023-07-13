@@ -7,16 +7,19 @@ using Raylib_cs;
 namespace CityBuilder
 {
     public enum Terrain { Water = 0, Flat, Hills }
-    public class Tile : IRenderable, IUpdatable, IClickable, ITriangle
+    public class Tile : IGUIElement, IRenderable, IUpdatable, IClickable, ITriangle
     {
         public Tile()
         {
             Shown = true;
             Active = true;
+            GUILayer = 3;
         }
         [JsonInclude]
         [JsonConverter(typeof(TerrainJsonConverter))]
         public Terrain Terrain { get; protected set; }
+        public GUIManager? GUIManager { get; set; }
+        public int GUILayer { get; }
         public bool Shown { get; }
         public bool Active { get; }
         protected TriangleCollider MouseCollider;
@@ -81,7 +84,7 @@ namespace CityBuilder
             Point1 = point1;
             Point2 = point2;
             Point3 = point3;
-            guiManager.Attach(this, 1);
+            this.AttachGUI(guiManager);
         }
         public void ChangeTerrain(Terrain terrain, Vector2 point)
         {

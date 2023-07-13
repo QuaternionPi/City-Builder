@@ -7,7 +7,7 @@ using Raylib_cs;
 namespace CityBuilder
 {
     public enum MapMode { PaintTerrain, DrawLine }
-    public class Map : IRenderable
+    public class Map : IGUIElement, IRenderable
     {
         public Map()
         {
@@ -17,6 +17,7 @@ namespace CityBuilder
             LineSegment = new LineSegment();
             Line = new Line<LineSegment>();
             Shown = true;
+            GUILayer = 1;
         }
         public Map(int x, int y)
         {
@@ -32,7 +33,10 @@ namespace CityBuilder
             LineSegment = new LineSegment();
             Line = new Line<LineSegment>();
             Shown = true;
+            GUILayer = 4;
         }
+        public GUIManager? GUIManager { get; set; }
+        public int GUILayer { get; }
         public bool Shown { get; }
         public static readonly int CellSize = 40;
         [JsonInclude]
@@ -63,7 +67,7 @@ namespace CityBuilder
                     cell.TileLeftDragged += TileLeftDrag;
                 }
             Line.Initialize(guiManager);
-            guiManager.Attach(this, 1);
+            this.AttachGUI(guiManager);
         }
         protected void TileLeftClick(object? sender, TileClickedArgs args)
         {
@@ -84,10 +88,7 @@ namespace CityBuilder
         {
             if ((Line.Connects(LineSegment) == false) || LineSegment.StartPosition == Vector2.Zero)
             {
-                LineSegment = new LineSegment
-                {
-                    StartPosition = position
-                };
+                LineSegment = new LineSegment { StartPosition = position };
             }
             else
             {
@@ -98,6 +99,40 @@ namespace CityBuilder
                     LineSegment = new LineSegment();
                 }
             }
+        }
+    }
+    public interface IMapTool
+    {
+        public void LeftClick(Map map, Cell cell, Tile tile);
+        public void RightClick(Map map, Cell cell, Tile tile);
+        public void LeftDrag(Map map, Cell cell, Tile tile);
+        public void RightDrag(Map map, Cell cell, Tile tile);
+    }
+    public class MapPainter : IMapTool
+    {
+        private MapPainter()
+        {
+
+        }
+        public MapPainter SingleTilePainter()
+        {
+            return new MapPainter();
+        }
+        public void LeftClick(Map map, Cell cell, Tile tile)
+        {
+
+        }
+        public void RightClick(Map map, Cell cell, Tile tile)
+        {
+
+        }
+        public void LeftDrag(Map map, Cell cell, Tile tile)
+        {
+
+        }
+        public void RightDrag(Map map, Cell cell, Tile tile)
+        {
+
         }
     }
 }

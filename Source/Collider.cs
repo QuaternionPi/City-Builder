@@ -127,11 +127,7 @@ namespace CityBuilder
         }
         public static bool Collides(TriangleCollider collider1, TriangleCollider collider2)
         {
-            bool anyCollision = false;
-            anyCollision |= Raylib.CheckCollisionPointTriangle(collider1.Point1, collider2.Point1, collider2.Point2, collider2.Point3);
-            anyCollision |= Raylib.CheckCollisionPointTriangle(collider1.Point2, collider2.Point1, collider2.Point2, collider2.Point3);
-            anyCollision |= Raylib.CheckCollisionPointTriangle(collider1.Point3, collider2.Point1, collider2.Point2, collider2.Point3);
-            return anyCollision;
+            throw new NotImplementedException();
         }
         public static bool Collides(CircleCollider collider1, RectangleCollider collider2) => Collides(collider2, collider1);
         public static bool Collides(RectangleCollider collider1, CircleCollider collider2)
