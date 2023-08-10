@@ -7,85 +7,59 @@ using Raylib_cs;
 namespace CityBuilder
 {
     public enum Terrain { Water = 0, Flat, Hills }
-    public class Tile : IGUIElement, IRenderable, IUpdatable, IClickable, ITriangle
+    public class Tile : IRenderable
     {
-        public Tile()
+        public Tile(IScreen screen, IMouse mouse, Vector2[] points)
         {
-            Shown = true;
-            Active = true;
-            GUILayer = 3;
+            Screen = screen;
+            Mouse = mouse;
+            Points = points;
+            MouseCollider = new TriangleCollider(points[0], points[1], points[2]);
+            mouse.MouseReleased += HandleClick;
+            mouse.UpdateIsMoused += UpdateIsMoused;
         }
+        protected IScreen Screen { get; }
+        protected IMouse Mouse { get; }
+        protected Vector2[] Points { get; }
+        protected TriangleCollider MouseCollider;
         [JsonInclude]
         [JsonConverter(typeof(TerrainJsonConverter))]
         public Terrain Terrain { get; protected set; }
-        public GUIManager? GUIManager { get; set; }
-        public int GUILayer { get; }
-        public bool Shown { get; }
-        public bool Active { get; }
-        protected TriangleCollider MouseCollider;
-        public event EventHandler? LeftClicked;
-        public event EventHandler? RightClicked;
-        public event EventHandler? LeftDragged;
-        public event EventHandler? RightDragged;
-        public float X { get { return Position.X; } private set { Position = new(value, Position.Y); } }
-        public float Y { get { return Position.Y; } private set { Position = new(Position.X, value); } }
+        public delegate void Select(Tile sender);
+        public event Select? Selected;
+        public float X { get { return Position.X; } }
+        public float Y { get { return Position.Y; } }
         public Vector2 Position
         {
-            get { return (Point1 + Point2 + Point3) / 3; }
-            private set
-            {
-                Vector2 delta = value - Position;
-                Point1 += delta;
-                Point2 += delta;
-                Point3 += delta;
-            }
+            get { return (Points[1] + Points[2] + Points[3]) / 3; }
         }
-        public Vector2 Point1 { get { return MouseCollider.Point1; } private set { MouseCollider = new TriangleCollider(value, Point2, Point3); } }
-        public Vector2 Point2 { get { return MouseCollider.Point2; } private set { MouseCollider = new TriangleCollider(Point1, value, Point3); } }
-        public Vector2 Point3 { get { return MouseCollider.Point3; } private set { MouseCollider = new TriangleCollider(Point1, Point2, value); } }
         public void Render()
         {
-            Color drawColor = IsMoused() ? Color.RED : Terrain switch
+            Color drawColor = IsMoused ? Color.RED : Terrain switch
             {
                 Terrain.Water => Color.BLUE,
                 Terrain.Flat => Color.GREEN,
                 Terrain.Hills => Color.DARKGREEN,
                 _ => throw new Exception(),
             };
-            Raylib.DrawTriangle(Point1, Point2, Point3, drawColor);
+            Screen.DrawTriangle(Points, drawColor);
         }
-        public void Update()
+        protected void HandleClick(IMouse mouse, MouseButton button)
         {
-
+            if (button == MouseButton.MOUSE_LEFT_BUTTON && IsMoused)
+            {
+                Selected?.Invoke(this);
+                mouse.Block();
+            }
         }
-        public bool IsMoused()
+        protected void UpdateIsMoused(bool mouseBlocked)
         {
-            Vector2 mousePosition = Raylib.GetMousePosition();
-            return MouseCollider.Collides(mousePosition);
+            Vector2 mousePosition = Mouse.Position;
+            IsMoused = (mouseBlocked == false) && MouseCollider.Collides(mousePosition);
+            if (IsMoused)
+                Mouse.Block();
         }
-        public void LeftClick()
-        {
-            LeftClicked?.Invoke(this, EventArgs.Empty);
-        }
-        public void RightClick()
-        {
-            RightClicked?.Invoke(this, EventArgs.Empty);
-        }
-        public void LeftDrag()
-        {
-            LeftDragged?.Invoke(this, EventArgs.Empty);
-        }
-        public void RightDrag()
-        {
-            RightDragged?.Invoke(this, EventArgs.Empty);
-        }
-        public void Initialize(GUIManager guiManager, Vector2 point1, Vector2 point2, Vector2 point3)
-        {
-            Point1 = point1;
-            Point2 = point2;
-            Point3 = point3;
-            this.AttachGUI(guiManager);
-        }
+        protected bool IsMoused { get; set; }
         public void ChangeTerrain(Terrain terrain, Vector2 point)
         {
             if (MouseCollider.Collides(point))

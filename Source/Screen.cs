@@ -60,8 +60,7 @@ namespace CityBuilder
         public void DrawRectangle(Vector2 centre, Vector2 dimensions, Color color) => DrawRectangle(centre, dimensions, color, 0);
         public void DrawRectangle(Vector2 centre, Vector2 dimensions, Color color, float rotation)
         {
-            Vector2 position = centre - dimensions / 2;
-            Rectangle rectangle = new(position.X, position.Y, dimensions.X, dimensions.Y);
+            Rectangle rectangle = new(centre.X, centre.Y, dimensions.X, dimensions.Y);
             Raylib.DrawRectanglePro(rectangle, dimensions / 2, rotation, color);
         }
         public void DrawTriangle(Vector2[] points, Color color)

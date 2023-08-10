@@ -6,83 +6,48 @@ using Raylib_cs;
 
 namespace CityBuilder
 {
-    public class Cell : IRectangle
+    public class Cell : IRectangle, IRenderable
     {
-        public Cell()
+        public Cell(IScreen screen, IMouse mouse, Vector2 position, Vector2 dimensions)
         {
-            TopTile = new Tile();
-            RightTile = new Tile();
-            BottomTile = new Tile();
-            LeftTile = new Tile();
+            Screen = screen;
+            Mouse = mouse;
+            Vector2 topLeft = position - dimensions / 2;
+            Vector2 bottomRight = position + dimensions / 2;
+            Vector2 topRight = position + new Vector2(dimensions.X, -dimensions.Y) / 2;
+            Vector2 bottomLeft = position + new Vector2(-dimensions.X, dimensions.Y) / 2;
+
+            Tile top = new(screen, mouse, new[] { position, topRight, topLeft });
+            Tile right = new(screen, mouse, new[] { position, bottomRight, topRight });
+            Tile bottom = new(screen, mouse, new[] { position, bottomLeft, bottomRight });
+            Tile left = new(screen, mouse, new[] { position, topLeft, bottomLeft });
+            Tiles = new Tile[4] { top, right, bottom, left };
+            foreach (Tile tile in Tiles)
+            {
+                tile.Selected += HandleTileSelect;
+            }
         }
-        [JsonInclude]
-        public Tile TopTile { get; set; }
-        [JsonInclude]
-        public Tile RightTile { get; set; }
-        [JsonInclude]
-        public Tile BottomTile { get; set; }
-        [JsonInclude]
-        public Tile LeftTile { get; set; }
-        public event EventHandler<TileClickedArgs>? TileLeftClicked;
-        public event EventHandler<TileClickedArgs>? TileLeftDragged;
+        protected IScreen Screen;
+        protected IMouse Mouse;
+        public Tile[] Tiles;
+        public delegate void Select(Cell cell, Tile tile);
+        public event Select? Selected;
         public float X { get { return Position.X; } protected set { Position = new(value, Position.Y); } }
         public float Y { get { return Position.Y; } protected set { Position = new(Position.X, value); } }
         public Vector2 Position { get; set; }
         public float Width { get { return Dimensions.X; } protected set { Dimensions = new(value, Dimensions.Y); } }
         public float Height { get { return Dimensions.Y; } protected set { Dimensions = new(Dimensions.X, value); } }
         public Vector2 Dimensions { get; set; }
-        public void Initialize(GUIManager guiManager, Vector2 position, Vector2 dimensions)
+        public void Render()
         {
-            Position += position;
-            Dimensions += dimensions;
-
-            Vector2 topLeft = Position - Dimensions / 2;
-            Vector2 topRight = Position + new Vector2(Width / 2, -Height / 2);
-            Vector2 bottomRight = Position + Dimensions / 2;
-            Vector2 bottomLeft = Position + new Vector2(-Width / 2, Height / 2);
-
-            TopTile.Initialize(guiManager, Position, topRight, topLeft);
-            RightTile.Initialize(guiManager, Position, bottomRight, topRight);
-            BottomTile.Initialize(guiManager, Position, bottomLeft, bottomRight);
-            LeftTile.Initialize(guiManager, Position, topLeft, bottomLeft);
-
-            TopTile.LeftClicked += TileLeftClick;
-            RightTile.LeftClicked += TileLeftClick;
-            BottomTile.LeftClicked += TileLeftClick;
-            LeftTile.LeftClicked += TileLeftClick;
-
-            TopTile.LeftDragged += TileLeftDrag;
-            RightTile.LeftDragged += TileLeftDrag;
-            BottomTile.LeftDragged += TileLeftDrag;
-            LeftTile.LeftDragged += TileLeftDrag;
-        }
-        protected void TileLeftClick(object? sender, EventArgs eventArgs) => TileLeftClick(sender);
-        protected void TileLeftClick(object? sender)
-        {
-            if (sender is not Tile tile)
+            foreach (Tile tile in Tiles)
             {
-                throw new Exception();
+                tile.Render();
             }
-            TileClickedArgs args = new(tile);
-            TileLeftClicked?.Invoke(this, args);
         }
-        protected void TileLeftDrag(object? sender, EventArgs eventArgs) => TileLeftDrag(sender);
-        protected void TileLeftDrag(object? sender)
+        public void HandleTileSelect(Tile tile)
         {
-            if (sender is not Tile tile)
-            {
-                throw new Exception();
-            }
-            TileClickedArgs args = new(tile);
-            TileLeftDragged?.Invoke(this, args);
+            Selected?.Invoke(this, tile);
         }
-    }
-    public class TileClickedArgs : EventArgs
-    {
-        public TileClickedArgs(Tile tile)
-        {
-            Tile = tile;
-        }
-        public readonly Tile Tile;
     }
 }

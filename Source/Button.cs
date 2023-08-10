@@ -7,26 +7,25 @@ using Raylib_cs;
 
 namespace CityBuilder
 {
-    public class Button : IGUIElement, IRenderable, IClickable, IRectangle
+    public class Button : IRectangle, IRenderable
     {
-        public Button(Vector2 position, Vector2 dimensions, String text)
+        public Button(IScreen screen, IMouse mouse, Vector2 position, Vector2 dimensions, String text)
         {
-            Shown = true;
-            GUILayer = 4;
+            Screen = screen;
+            Mouse = mouse;
+            mouse.MouseReleased += HandleClick;
+            mouse.UpdateIsMoused += UpdateIsMoused;
             Position = position;
             Dimensions = dimensions;
             MouseCollider = new RectangleCollider(position, dimensions);
             Text = text;
         }
+        protected IScreen Screen { get; }
+        protected IMouse Mouse { get; }
         protected String Text { get; set; }
-        public GUIManager? GUIManager { get; set; }
-        public int GUILayer { get; }
-        public bool Shown { get; }
         protected RectangleCollider MouseCollider { get; set; }
-        public event EventHandler? LeftClicked;
-        public event EventHandler? RightClicked;
-        public event EventHandler? LeftDragged;
-        public event EventHandler? RightDragged;
+        public delegate void Click();
+        public event Click? Clicked;
         public float X { get { return Position.X; } protected set { Position = new(value, Position.Y); } }
         public float Y { get { return Position.Y; } protected set { Position = new(Position.X, value); } }
         public Vector2 Position { get; set; }
@@ -35,37 +34,26 @@ namespace CityBuilder
         public Vector2 Dimensions { get; set; }
         public void Render()
         {
-            Color boxColor = IsMoused() ? new Color(255, 255, 255, 125) : new Color(255, 255, 255, 55);
-            Raylib.DrawRectangle((int)(X - Width / 2), (int)(Y - Height / 2), (int)Width, (int)Height, boxColor);
-            Vector2 textDimensions = Raylib.MeasureTextEx(Raylib.GetFontDefault(), Text, 20, 1);
-            float x = X - textDimensions.X / 2;
-            float y = Y - textDimensions.Y / 2;
-            Raylib.DrawTextEx(Raylib.GetFontDefault(), Text, new(x, y), 20, 1, Color.LIGHTGRAY);
+            Color boxColor = IsMoused ? new Color(255, 255, 255, 125) : new Color(255, 255, 255, 55);
+            Screen.DrawRectangle(Position, Dimensions, boxColor);
+
+            Screen.DrawText(Text, Color.LIGHTGRAY, Position, 20, 1);
         }
-        public bool IsMoused()
+        protected void UpdateIsMoused(bool mouseBlocked)
         {
-            Vector2 mousePosition = Raylib.GetMousePosition();
-            return MouseCollider.Collides(mousePosition);
+            Vector2 mousePosition = Mouse.Position;
+            IsMoused = (mouseBlocked == false) && MouseCollider.Collides(mousePosition);
+            if (IsMoused)
+                Mouse.Block();
         }
-        public void LeftClick()
+        protected bool IsMoused { get; set; }
+        public void HandleClick(IMouse mouse, MouseButton button)
         {
-            LeftClicked?.Invoke(this, EventArgs.Empty);
-        }
-        public void RightClick()
-        {
-            RightClicked?.Invoke(this, EventArgs.Empty);
-        }
-        public void LeftDrag()
-        {
-            LeftDragged?.Invoke(this, EventArgs.Empty);
-        }
-        public void RightDrag()
-        {
-            RightDragged?.Invoke(this, EventArgs.Empty);
-        }
-        public void Initialize(GUIManager guiManager)
-        {
-            this.AttachGUI(guiManager);
+            if (button == MouseButton.MOUSE_LEFT_BUTTON && IsMoused)
+            {
+                Clicked?.Invoke();
+                mouse.Block();
+            }
         }
     }
 }

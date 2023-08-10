@@ -12,8 +12,8 @@ namespace CityBuilder
     }
     public interface IRotationKinematic : IPosition, IRotate
     {
-        public Angle AngularVelocity { get; }
-        public Angle AngularAcceleration { get; }
+        public Numerics.Angle AngularVelocity { get; }
+        public Numerics.Angle AngularAcceleration { get; }
     }
     public static class KinematicExtensions
     {
@@ -25,11 +25,11 @@ namespace CityBuilder
         {
             return kinematic.Acceleration * Raylib.GetFrameTime();
         }
-        public static Angle ChangeInAngle(this IRotationKinematic kinematic)
+        public static Numerics.Angle ChangeInAngle(this IRotationKinematic kinematic)
         {
             return kinematic.AngularVelocity * Raylib.GetFrameTime();
         }
-        public static Angle ChangeInAngularVelocity(this IRotationKinematic kinematic)
+        public static Numerics.Angle ChangeInAngularVelocity(this IRotationKinematic kinematic)
         {
             return kinematic.AngularAcceleration * Raylib.GetFrameTime();
         }
