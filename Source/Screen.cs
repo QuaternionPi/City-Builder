@@ -13,6 +13,9 @@ namespace CityBuilder
         public void DrawText(String text, Color color, Vector2 centre, int fontSize, int fontSpacing);
         public void DrawTexture(Texture2D texture, Vector2 centre);
         public void DrawTexture(Texture2D texture, Vector2 centre, float rotation);
+        public void DrawRectangle(Vector2 centre, Vector2 dimensions, Color color);
+        public void DrawRectangle(Vector2 centre, Vector2 dimensions, Color color, float rotation);
+        public void DrawTriangle(Vector2[] points, Color color);
         public void BeginDrawing();
         public void EndDrawing();
         public void ClearBackground(Color color);
@@ -53,6 +56,18 @@ namespace CityBuilder
 
             Color color = Color.WHITE;
             Raylib.DrawTexturePro(texture, rectangle, rectangle, centre, rotation, color);
+        }
+        public void DrawRectangle(Vector2 centre, Vector2 dimensions, Color color) => DrawRectangle(centre, dimensions, color, 0);
+        public void DrawRectangle(Vector2 centre, Vector2 dimensions, Color color, float rotation)
+        {
+            Vector2 position = centre - dimensions / 2;
+            Rectangle rectangle = new(position.X, position.Y, dimensions.X, dimensions.Y);
+            Raylib.DrawRectanglePro(rectangle, dimensions / 2, rotation, color);
+        }
+        public void DrawTriangle(Vector2[] points, Color color)
+        {
+            if (points.Length != 3) throw new Exception("A triangle must have three points");
+            Raylib.DrawTriangle(points[0], points[1], points[2], color);
         }
         public void BeginDrawing() => Raylib.BeginDrawing();
         public void EndDrawing() => Raylib.EndDrawing();
