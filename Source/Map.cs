@@ -26,19 +26,27 @@ namespace CityBuilder
                     cell.Selected += HandleTileSelect;
                 }
             }
-            LineSegment = new LineSegment();
-            Line = new Line<LineSegment>();
+            List<Vector2> controlPoints = new() {
+                new(100, 100),
+                new(100, 200),
+                new(200, 300),
+                new(200, 400),
+                new(300, 450),
+                new(400, 450),
+                new(500, 350)
+                };
+            Spline = new(screen, controlPoints);
+            Spline.Style = new Spline.Cardinal(Spline, Color.DARKGRAY, 3, 0.05f);
         }
         protected IScreen Screen { get; }
         protected IMouse Mouse { get; }
+        protected Spline Spline { get; }
         public static readonly int CellSize = 40;
         [JsonInclude]
         public Cell[][] Cells { get; private set; }
         public MapMode Mode { get; set; }
         protected Terrain Terrain;
         public Terrain PaintTerrain { get { return Terrain; } set { Terrain = value; Mode = MapMode.PaintTerrain; } }
-        protected LineSegment LineSegment;
-        protected Line<LineSegment> Line;
         public void Render()
         {
             foreach (var row in Cells)
@@ -48,36 +56,16 @@ namespace CityBuilder
                     cell.Render();
                 }
             }
-            LineSegment.EndPosition = Raylib.GetMousePosition();
-            if (LineSegment.StartPosition != Vector2.Zero)
-                LineSegment.Render();
+            Spline.Render();
         }
         protected void HandleTileSelect(Cell cell, Tile tile)
         {
-            if (Mode == MapMode.DrawLine)
-                DrawLine(cell.Position);
             if (Mode == MapMode.PaintTerrain)
                 Paint(tile);
         }
         protected void Paint(Tile tile)
         {
             tile.ChangeTerrain(PaintTerrain, Raylib.GetMousePosition());
-        }
-        protected void DrawLine(Vector2 position)
-        {
-            if ((Line.Connects(LineSegment) == false) || LineSegment.StartPosition == Vector2.Zero)
-            {
-                LineSegment = new LineSegment { StartPosition = position };
-            }
-            else
-            {
-                LineSegment.EndPosition = position;
-                if (LineSegment.Length < 1.5 * CellSize)
-                {
-                    Line.AddLine(LineSegment);
-                    LineSegment = new LineSegment();
-                }
-            }
         }
     }
     public interface IMapTool

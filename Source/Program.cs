@@ -31,7 +31,6 @@ namespace CityBuilder
 
                 game.Render();
 
-                Raylib.DrawText("Hello, world!", 12, 12, 20, Color.BLACK);
                 screen.EndDrawing();
             }
             Raylib.CloseWindow();
