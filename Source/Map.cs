@@ -41,13 +41,13 @@ namespace CityBuilder
         }
         protected IScreen Screen { get; }
         protected IMouse Mouse { get; }
-        protected Transit.TrainLine TrainLine { get; }
-        public static readonly int CellSize = 40;
         [JsonInclude]
         public Cell[][] Cells { get; private set; }
-        public MapMode Mode { get; set; }
-        protected Terrain Terrain;
-        public Terrain PaintTerrain { get { return Terrain; } set { Terrain = value; Mode = MapMode.PaintTerrain; } }
+        protected Transit.TrainLine TrainLine { get; }
+        public delegate void Select(Map map, Cell cell, Tile tile);
+        public event Select? Selected;
+        public Terrain PaintTerrain;
+        public static readonly int CellSize = 40;
         public void Render()
         {
             foreach (var row in Cells)
@@ -61,36 +61,17 @@ namespace CityBuilder
         }
         protected void HandleTileSelect(Cell cell, Tile tile)
         {
-            if (Mode == MapMode.PaintTerrain)
-                Paint(tile);
+            Selected?.Invoke(this, cell, tile);
         }
-        protected void Paint(Tile tile)
+        public void Paint(Tile tile)
         {
             tile.ChangeTerrain(PaintTerrain);
         }
-    }
-    public interface IMapTool
-    {
-        public void LeftClick(Map map, Cell cell, Tile tile);
-        public void RightClick(Map map, Cell cell, Tile tile);
-    }
-    public class MapPainter : IMapTool
-    {
-        private MapPainter()
+        public void AddTrainStation(Vector2 position)
         {
-
-        }
-        public MapPainter SingleTilePainter()
-        {
-            return new MapPainter();
-        }
-        public void LeftClick(Map map, Cell cell, Tile tile)
-        {
-
-        }
-        public void RightClick(Map map, Cell cell, Tile tile)
-        {
-
+            Vector2 stationDimensions = new(20, 10);
+            Transit.TrainStation station = new(Screen, position, stationDimensions);
+            TrainLine.AddTrainStation(station);
         }
     }
 }

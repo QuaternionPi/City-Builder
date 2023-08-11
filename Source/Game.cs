@@ -16,26 +16,18 @@ namespace CityBuilder
             MapMouse = new CameraOffsetMouse(new RaylibMouse());
             Map = new Map(screen, MapMouse, x, y);
             Camera = new Camera2D(Vector2.Zero, Vector2.Zero, 0, 1);
+            Tool = new Selector(Screen, this);
 
-            Button setWater = new(screen, ButtonMouse, new(150, 50), new(250, 40), "Water");
-            Button setFlat = new(screen, ButtonMouse, new(150, 100), new(250, 40), "Flat");
-            Button setHills = new(screen, ButtonMouse, new(150, 150), new(250, 40), "Hills");
-            Button setDrawLine = new(screen, ButtonMouse, new(150, 200), new(250, 40), "Draw Line");
-
-            setWater.Clicked += SetMapPaintTerrainWater;
-            setFlat.Clicked += SetMapPaintTerrainFlat;
-            setHills.Clicked += SetMapPaintTerrainHills;
-            setDrawLine.Clicked += SetMapDrawLine;
-            Buttons = new List<Button>() { setWater, setFlat, setHills, setDrawLine };
+            Map.Selected += HandleTileSelect;
         }
         protected IScreen Screen { get; }
-        protected IMouse ButtonMouse { get; }
+        protected IMouse ButtonMouse { get; set; }
         protected CameraOffsetMouse MapMouse { get; }
         protected ICameraControler2D CameraControler { get; }
         protected Camera2D Camera;
+        protected MapTool Tool;
         [JsonInclude]
         protected Map Map { get; }
-        protected List<Button> Buttons { get; }
         public static Game LoadGame(String json)
         {
             Game game = JsonSerializer.Deserialize<Game>(json) ?? throw new Exception();
@@ -52,6 +44,7 @@ namespace CityBuilder
             if ((mouseBlocked || mouseBlockedByButton) == false)
                 MapMouse.CheckForClick();
 
+            Tool.Update();
         }
         public void Render()
         {
@@ -59,26 +52,124 @@ namespace CityBuilder
             Raylib.BeginMode2D(Camera);
             Map.Render();
             Raylib.EndMode2D();
-            foreach (Button button in Buttons)
+            Tool.Render();
+        }
+        public void HandleTileSelect(Map map, Cell cell, Tile tile) => Tool.HandleTileSelect(map, cell, tile);
+        protected abstract class MapTool
+        {
+            public MapTool(IScreen screen, Game game)
             {
-                button.Render();
+                Screen = screen;
+                Game = game;
+                Buttons = new List<Button>();
+            }
+            protected IScreen Screen { get; }
+            protected Game Game { get; }
+            protected List<Button> Buttons { get; set; }
+            public abstract void Update();
+            public abstract void Render();
+            public abstract void HandleTileSelect(Map map, Cell cell, Tile tile);
+        }
+        protected class Selector : MapTool
+        {
+            public Selector(IScreen screen, Game game) : base(screen, game)
+            {
+                Game.ButtonMouse = new RaylibMouse();
+                Vector2 dimension = new(240, 40);
+                Button mapPainter = new(screen, Game.ButtonMouse, new(240, 100), dimension, "Map Painter");
+                Button trainLineCreater = new(screen, Game.ButtonMouse, new(240, 160), dimension, "Train Line Creater");
+                Buttons = new List<Button>() { mapPainter, trainLineCreater };
+                mapPainter.Clicked += SelectMapPainter;
+                trainLineCreater.Clicked += SelectTrainLineCreater;
+            }
+            public override void Update() { }
+            public override void Render()
+            {
+                foreach (Button button in Buttons)
+                {
+                    button.Render();
+                }
+                Game.Screen.DrawText("Selector Mode", Color.BLACK, new(400, 50), 30, 2);
+            }
+            public override void HandleTileSelect(Map map, Cell cell, Tile tile)
+            {
+
+            }
+            protected void SelectMapPainter()
+            {
+                Game.Tool = new MapPainter(Screen, Game);
+            }
+            protected void SelectTrainLineCreater()
+            {
+                Game.Tool = new TrainLineCreater(Screen, Game);
             }
         }
-        public void SetMapPaintTerrainWater()
+        protected class MapPainter : MapTool
         {
-            Map.PaintTerrain = Terrain.Water;
+            public MapPainter(IScreen screen, Game game) : base(screen, game)
+            {
+
+                Game.ButtonMouse = new RaylibMouse();
+                Vector2 dimension = new Vector2(240, 40);
+                Button water = new(screen, Game.ButtonMouse, new(240, 100), dimension, "Water");
+                Button land = new(screen, Game.ButtonMouse, new(240, 160), dimension, "Land");
+                Button hills = new(screen, Game.ButtonMouse, new(240, 220), dimension, "Hills");
+                Button selector = new(screen, Game.ButtonMouse, new(240, 280), dimension, "Selector");
+                Buttons = new List<Button>() { water, land, hills, selector };
+                water.Clicked += PaintWater;
+                land.Clicked += PaintLand;
+                hills.Clicked += PaintHills;
+                selector.Clicked += SelectSelector;
+            }
+            public override void Update() { }
+            public override void Render()
+            {
+                foreach (Button button in Buttons)
+                {
+                    button.Render();
+                }
+                Game.Screen.DrawText("Map Painter Mode", Color.BLACK, new(400, 50), 30, 2);
+            }
+            public override void HandleTileSelect(Map map, Cell cell, Tile tile)
+            {
+                map.Paint(tile);
+            }
+            protected void PaintWater()
+            {
+                Game.Map.PaintTerrain = Terrain.Water;
+            }
+            protected void PaintLand()
+            {
+                Game.Map.PaintTerrain = Terrain.Flat;
+            }
+            protected void PaintHills()
+            {
+                Game.Map.PaintTerrain = Terrain.Hills;
+            }
+            protected void SelectSelector()
+            {
+                Game.Tool = new Selector(Screen, Game);
+            }
         }
-        public void SetMapPaintTerrainFlat()
+        protected class TrainLineCreater : MapTool
         {
-            Map.PaintTerrain = Terrain.Flat;
-        }
-        public void SetMapPaintTerrainHills()
-        {
-            Map.PaintTerrain = Terrain.Hills;
-        }
-        public void SetMapDrawLine()
-        {
-            Map.Mode = MapMode.DrawLine;
+            public TrainLineCreater(IScreen screen, Game game) : base(screen, game)
+            {
+                Game.ButtonMouse = new RaylibMouse();
+            }
+            public override void Update() { }
+            public override void Render()
+            {
+                foreach (Button button in Buttons)
+                {
+                    button.Render();
+                }
+                Game.Screen.DrawText("Train Line Creater Mode", Color.BLACK, new(400, 50), 30, 2);
+            }
+            public override void HandleTileSelect(Map map, Cell cell, Tile tile)
+            {
+                map.AddTrainStation(cell.Position);
+            }
         }
     }
 }

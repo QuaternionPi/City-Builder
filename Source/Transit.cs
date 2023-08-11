@@ -51,6 +51,13 @@ namespace CityBuilder
                     station.Render();
                 }
             }
+            public void AddTrainStation(TrainStation station)
+            {
+                Stations.Add(station);
+                List<Vector2> controlPoints = (from Station in Stations select Station.Position).ToList<Vector2>();
+                Spline = new Spline(Screen, controlPoints);
+                Spline.Style = new Spline.Cardinal(Spline, Color.DARKBLUE, 3, 0.2f);
+            }
         }
         public class Train : IVehicle
         {

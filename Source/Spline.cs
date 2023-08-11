@@ -20,6 +20,10 @@ namespace CityBuilder
         protected IScreen Screen;
         public DrawStyle Style;
         public List<Vector2> ControlPoints { get; protected set; }
+        public void InsertControlPoint(Vector2 point, int index)
+        {
+            ControlPoints.Insert(index, point);
+        }
         public void Render()
         {
             Style.Render();

@@ -12,6 +12,8 @@ namespace CityBuilder
         {
             Screen = screen;
             Mouse = mouse;
+            Position = position;
+            Dimensions = dimensions;
             Vector2 topLeft = position - dimensions / 2;
             Vector2 bottomRight = position + dimensions / 2;
             Vector2 topRight = position + new Vector2(dimensions.X, -dimensions.Y) / 2;
