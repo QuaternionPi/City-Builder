@@ -26,21 +26,22 @@ namespace CityBuilder
                     cell.Selected += HandleTileSelect;
                 }
             }
-            List<Vector2> controlPoints = new() {
-                new(100, 100),
-                new(100, 200),
-                new(200, 300),
-                new(200, 400),
-                new(300, 450),
-                new(400, 450),
-                new(500, 350)
+
+            Vector2 stationDimensions = new(20, 10);
+            List<Transit.TrainStation> stations = new() {
+                new(screen, new(100, 100), stationDimensions),
+                new(screen, new(100, 200), stationDimensions),
+                new(screen, new(200, 300), stationDimensions),
+                new(screen, new(200, 400), stationDimensions),
+                new(screen, new(300, 450), stationDimensions),
+                new(screen, new(400, 450), stationDimensions),
+                new(screen, new(500, 350), stationDimensions),
                 };
-            Spline = new(screen, controlPoints);
-            Spline.Style = new Spline.Cardinal(Spline, Color.DARKGRAY, 3, 0.05f);
+            TrainLine = new(screen, "Expo Line", stations);
         }
         protected IScreen Screen { get; }
         protected IMouse Mouse { get; }
-        protected Spline Spline { get; }
+        protected Transit.TrainLine TrainLine { get; }
         public static readonly int CellSize = 40;
         [JsonInclude]
         public Cell[][] Cells { get; private set; }
@@ -56,7 +57,7 @@ namespace CityBuilder
                     cell.Render();
                 }
             }
-            Spline.Render();
+            TrainLine.Render();
         }
         protected void HandleTileSelect(Cell cell, Tile tile)
         {
