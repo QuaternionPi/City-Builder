@@ -66,7 +66,7 @@ namespace CityBuilder
         }
         protected void Paint(Tile tile)
         {
-            tile.ChangeTerrain(PaintTerrain, Raylib.GetMousePosition());
+            tile.ChangeTerrain(PaintTerrain);
         }
     }
     public interface IMapTool

@@ -13,7 +13,7 @@ namespace CityBuilder
             Screen = screen;
             CameraControler = cameraControler;
             ButtonMouse = new RaylibMouse();
-            MapMouse = new RaylibMouse();
+            MapMouse = new CameraOffsetMouse(new RaylibMouse());
             Map = new Map(screen, MapMouse, x, y);
             Camera = new Camera2D(Vector2.Zero, Vector2.Zero, 0, 1);
 
@@ -30,7 +30,7 @@ namespace CityBuilder
         }
         protected IScreen Screen { get; }
         protected IMouse ButtonMouse { get; }
-        protected IMouse MapMouse { get; }
+        protected CameraOffsetMouse MapMouse { get; }
         protected ICameraControler2D CameraControler { get; }
         protected Camera2D Camera;
         [JsonInclude]
@@ -43,6 +43,7 @@ namespace CityBuilder
         }
         public void Update(bool mouseBlocked)
         {
+            MapMouse.UpdatePosition(Camera);
             bool mouseBlockedByButton = ButtonMouse.IsAnythingMoused(mouseBlocked);
             if (mouseBlocked == false)
                 ButtonMouse.CheckForClick();

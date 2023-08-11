@@ -60,17 +60,12 @@ namespace CityBuilder
                 Mouse.Block();
         }
         protected bool IsMoused { get; set; }
-        public void ChangeTerrain(Terrain terrain, Vector2 point)
-        {
-            if (MouseCollider.Collides(point))
-                ChangeTerrain(terrain);
-        }
         public void ChangeTerrain(Terrain terrain, ICollider collider)
         {
             if (MouseCollider.Collides(collider))
                 ChangeTerrain(terrain);
         }
-        protected void ChangeTerrain(Terrain terrain)
+        public void ChangeTerrain(Terrain terrain)
         {
             Terrain = terrain;
         }
