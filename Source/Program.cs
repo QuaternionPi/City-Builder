@@ -18,8 +18,10 @@ namespace CityBuilder
 
             IScreen screen = RaylibScreen.TheWindow!;
             IMouse mouse = new RaylibMouse();
+            IKeyboard keyboard = new RaylibKeyboard();
+            ICameraControler2D cameraControler = new KeyboardCameraControler(keyboard);
 
-            Game game = new(screen, 20, 15);
+            Game game = new(screen, cameraControler, 20, 15);
             while (!Raylib.WindowShouldClose())
             {
                 bool mouseBlocked = mouse.IsAnythingMoused(false);

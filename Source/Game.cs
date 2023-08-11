@@ -8,9 +8,10 @@ namespace CityBuilder
 {
     public class Game : IRenderable
     {
-        public Game(IScreen screen, int x, int y)
+        public Game(IScreen screen, ICameraControler2D cameraControler, int x, int y)
         {
             Screen = screen;
+            CameraControler = cameraControler;
             ButtonMouse = new RaylibMouse();
             MapMouse = new RaylibMouse();
             Map = new Map(screen, MapMouse, x, y);
@@ -30,10 +31,11 @@ namespace CityBuilder
         protected IScreen Screen { get; }
         protected IMouse ButtonMouse { get; }
         protected IMouse MapMouse { get; }
+        protected ICameraControler2D CameraControler { get; }
+        protected Camera2D Camera;
         [JsonInclude]
         protected Map Map { get; }
         protected List<Button> Buttons { get; }
-        protected Camera2D Camera { get; }
         public static Game LoadGame(String json)
         {
             Game game = JsonSerializer.Deserialize<Game>(json) ?? throw new Exception();
@@ -52,13 +54,14 @@ namespace CityBuilder
         }
         public void Render()
         {
+            Camera.target += CameraControler.Direction * 10;
             Raylib.BeginMode2D(Camera);
             Map.Render();
+            Raylib.EndMode2D();
             foreach (Button button in Buttons)
             {
                 button.Render();
             }
-            Raylib.EndMode2D();
         }
         public void SetMapPaintTerrainWater()
         {
