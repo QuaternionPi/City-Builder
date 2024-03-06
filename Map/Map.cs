@@ -7,6 +7,7 @@ public class Map
 {
     private IMapMode Mode;
     public readonly Cell[,] Cells;
+    public IEnumerable<Tile> Tiles { get { return from cell in Cells from tile in cell.Tiles select tile; } }
     public List<Road> Roads { get; protected set; }
     public Map(Cell[,] cells, List<Road> roads)
     {
@@ -33,10 +34,7 @@ public class MapDisplay : IMapMode
     public void Update(IKeyboard keyboard, IMouse mouse, float deltaTime) { }
     public void Draw(IGraphics graphics)
     {
-        foreach (var cell in Map.Cells)
-        {
-            cell.Draw(graphics);
-        }
+        foreach (var tile in Map.Tiles) tile.DrawLand(graphics);
         foreach (var road in Map.Roads)
         {
             road.Draw(graphics);
@@ -67,7 +65,7 @@ public class MapPaint : IMapMode
         string message = "message";
         Console.WriteLine(message);
     }
-    private void Paint(Vector2 position, Color color)
+    private void Paint(Vector2 position, Land land)
     {
         var hitCells =
             from Cell cell in Map.Cells
@@ -85,7 +83,7 @@ public class MapPaint : IMapMode
         if (hitTiles.Any() == false) { return; }
         Tile hitTile = hitTiles.First();
 
-        hitTile.Paint(color);
+        hitTile.Paint(land);
     }
     public void Update(IKeyboard keyboard, IMouse mouse, float deltaTime)
     {
@@ -94,16 +92,13 @@ public class MapPaint : IMapMode
             (keyboard, mouse) = button.Update(keyboard, mouse, deltaTime);
         }
 
-        Color color = Color.DARKBLUE;
+        Land land = new Land(Color.DARKBLUE, false);
         if (mouse.IsButtonDown(MouseButton.Left))
-            Paint(mouse.Position, color);
+            Paint(mouse.Position, land);
     }
     public void Draw(IGraphics graphics)
     {
-        foreach (var cell in Map.Cells)
-        {
-            cell.Draw(graphics);
-        }
+        foreach (var tile in Map.Tiles) tile.DrawLand(graphics);
         foreach (var road in Map.Roads)
         {
             road.Draw(graphics);

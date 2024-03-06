@@ -12,6 +12,53 @@ static class ArrayExtensions
                 result[i, j] = f(items[i, j]);
         return result;
     }
+    public static IEnumerable<TResult> SelectMany<TSource, TResult>(
+        this TSource[,] source,
+        Func<TSource, IEnumerable<TResult>> selector)
+    {
+        foreach (TSource item in source)
+            foreach (TResult selected in selector(item))
+                yield return selected;
+    }
+    public static IEnumerable<TResult> SelectMany<TSource, TResult>(
+        this TSource[,] source,
+        Func<TSource, int, IEnumerable<TResult>> selector)
+    {
+        int i = 0;
+        foreach (TSource item in source)
+        {
+            i++;
+            foreach (TResult selected in selector(item, i))
+                yield return selected;
+        }
+    }
+    public static IEnumerable<TResult> SelectMany<TSource, TCollection, TResult>(
+        this TSource[,] source,
+        Func<TSource, IEnumerable<TCollection>> collectionSelector,
+        Func<TSource, TCollection, TResult> resultSelector)
+    {
+        foreach (TSource item in source)
+        {
+            foreach (TCollection collection in collectionSelector(item))
+            {
+                yield return resultSelector(item, collection);
+            }
+        }
+    }
+
+    public static IEnumerable<TResult> SelectMany<TSource, TCollection, TResult>(
+        this TSource[,] source,
+        Func<TSource, int, IEnumerable<TCollection>> collectionSelector,
+        Func<TSource, TCollection, TResult> resultSelector)
+    {
+        int i = 0;
+        foreach (TSource item in source)
+        {
+            i++;
+            foreach (TCollection collection in collectionSelector(item, i))
+                yield return resultSelector(item, collection);
+        }
+    }
     public static bool Contains<T>(this T[,] items, T element)
     {
         int length0 = items.GetLength(0);

@@ -21,10 +21,10 @@ public class Cell
         Triangle bottom = Triangle.Clockwise(Center, bottomLeft, bottomRight);
         Triangle left = Triangle.Clockwise(Center, topLeft, bottomLeft);
 
-        Top = new Tile(top, color[0]);
-        Right = new Tile(right, color[1]);
-        Bottom = new Tile(bottom, color[2]);
-        Left = new Tile(left, color[3]);
+        Top = new Tile(top, new Land(color[0], false));
+        Right = new Tile(right, new Land(color[1], false));
+        Bottom = new Tile(bottom, new Land(color[2], false));
+        Left = new Tile(left, new Land(color[3], false));
     }
     private readonly Vector2 Center;
     private readonly Vector2 Dimensions;
@@ -37,9 +37,5 @@ public class Cell
     public bool Collidies(Vector2 point) => Collider.Collidies(new Collider(new Rectangle(Center, Dimensions)), point);
     public void Draw(IGraphics graphics)
     {
-        foreach (var tile in Tiles)
-        {
-            tile.Draw(graphics);
-        }
     }
 }
