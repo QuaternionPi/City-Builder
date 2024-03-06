@@ -4,7 +4,7 @@ using CityBuilder.IO;
 namespace CityBuilder;
 public static class Program
 {
-    static void Main(string[] args)
+    public static void Main(string[] args)
     {
         int fps = 60;
         float deltaTime = 1 / fps;
@@ -13,7 +13,7 @@ public static class Program
         Window.SetConfigFlags(Raylib_cs.ConfigFlags.FLAG_MSAA_4X_HINT);
         Window.Init(800, 600, "City Builder");
 
-        int seed = 12991174;
+        int seed = 1291174;
         Map.Map map = Map.MapGen.FromSeed(80, 60, seed);
 
         IGraphics graphics = new RaylibGraphics();
@@ -28,6 +28,11 @@ public static class Program
             graphics.EndDrawing();
 
             map.Update(keyboard, mouse, deltaTime);
+            if (keyboard.IsKeyReleased(KeyboardKey.Space))
+            {
+                seed++;
+                map = Map.MapGen.FromSeed(80, 60, seed);
+            }
         }
         Window.Close();
     }
