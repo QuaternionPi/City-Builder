@@ -146,6 +146,7 @@ public static class MapGen
 
         Terrain[,] continents = Create(x, y, Terrain.Ocean)
             .RandomAssign(Terrain.Grass, 0.4, seed - 50)
+            .Border(Terrain.Ocean, 4)
             .RunAutomata(Automata.Holstein, Terrain.Grass, Terrain.Ocean, 10)
             .RunAutomata(Automata.Coral, Terrain.Grass, Terrain.Ocean, 5)
             .RunAutomata(Automata.Bugs, Terrain.Grass, Terrain.Ocean, 20)
