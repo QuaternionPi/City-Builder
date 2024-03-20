@@ -144,6 +144,13 @@ public static class MapGen
 
         Terrain[,] map_base = Create(x, y, Terrain.Grass);
 
+        Terrain[,] continents = Create(x, y, Terrain.Ocean)
+            .RandomAssign(Terrain.Grass, 0.4, seed - 50)
+            .RunAutomata(Automata.Holstein, Terrain.Grass, Terrain.Ocean, 10)
+            .RunAutomata(Automata.Coral, Terrain.Grass, Terrain.Ocean, 5)
+            .RunAutomata(Automata.Bugs, Terrain.Grass, Terrain.Ocean, 20)
+            .RunAutomata(Automata.Smooth, Terrain.Grass, Terrain.Ocean, 5);
+
         Terrain[,] lakes = map_base
             .RandomAssign(Terrain.Lake, 0.1, seed)
             .Border(Terrain.Grass, 8)
@@ -174,6 +181,7 @@ public static class MapGen
             .Cover(cities, [Terrain.LowDensity])
             .Cover(lakes, [Terrain.Lake])
             .Cover(mountains, [Terrain.Mountain])
+            .Cover(continents, [Terrain.Ocean])
 
             .Line(Terrain.River, river, 1)
             .ToDraft().Cull(
@@ -264,15 +272,10 @@ public static class MapGen
         }
         return output;
     }
-    private static Terrain[,] Apply(this Terrain[,] input, Evolve evolve, int level)
+    private static Terrain[,] Apply(this Terrain[,] input, Evolve evolve, int level = 1)
     {
-        // recursion base-case
-        if (level == 0) { return input; }
-        Terrain[,] recurse = Apply(input, evolve, level - 1);
-        return Apply(recurse, evolve);
-    }
-    private static Terrain[,] Apply(this Terrain[,] input, Evolve evolve)
-    {
+        if (level <= 0) return input; // recursion base-case
+
         int x = input.GetLength(0);
         int y = input.GetLength(1);
         Terrain[,] output = new Terrain[x, y];
@@ -286,7 +289,7 @@ public static class MapGen
                 output[col, row] = evolve(cell, adjacent);
             }
         }
-        return output;
+        return Apply(output, evolve, level - 1);
     }
     private static Terrain[,] RandomAssign(this Terrain[,] input, Terrain replace, double threshhold, int seed)
     {
