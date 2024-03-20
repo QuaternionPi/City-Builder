@@ -132,42 +132,46 @@ public static class MapGen
         }
         public Func<int, bool> Born;
         public Func<int, bool> Survive;
-        public static Automata Coral { get { return new Automata((int x) => x >= 3, (int x) => x == 3); } }
-        public static Automata Smooth { get { return new Automata((int x) => x >= 4, (int x) => x >= 5); } }
-        public static Automata Holstein { get { return new Automata((int x) => x >= 6 || x == 4, (int x) => x >= 5 || x == 3); } }
+        public static Automata Coral { get { return new Automata((int x) => x == 3, (int x) => x >= 3); } }
+        public static Automata Smooth { get { return new Automata((int x) => x >= 5, (int x) => x >= 4); } }
+        public static Automata Holstein { get { return new Automata((int x) => x >= 5 || x == 3, (int x) => x >= 6 || x == 4); } }
+        public static Automata Bugs { get { return new Automata((int x) => x >= 3 && x != 4 && x != 8, (int x) => x >= 5 || x == 1); } }
+        public static Automata Vote { get { return new Automata((int x) => x >= 5, (int x) => x >= 4); } }
     }
     public static Map FromSeed(int x, int y, int seed)
     {
         Vector2[] river = [new(0, 0), new(0, 1), new(1, 1), new(1, 2), new(2, 2), new(2, 3), new(3, 3), new(3, 4), new(4, 4)];
 
-        Terrain[,] lakes =
-            Create(x, y, Terrain.Grass)
+        Terrain[,] map_base = Create(x, y, Terrain.Grass);
+
+        Terrain[,] lakes = map_base
             .RandomAssign(Terrain.Lake, 0.1, seed)
             .Border(Terrain.Grass, 8)
             .RunAutomata(Automata.Coral, Terrain.Lake, Terrain.Grass, 20)
+            .RunAutomata(Automata.Bugs, Terrain.Lake, Terrain.Grass, 5)
             .RunAutomata(Automata.Smooth, Terrain.Lake, Terrain.Grass, 1)
             .Border(Terrain.Grass, 2);
 
-        Terrain[,] mountains =
-            Create(x, y, Terrain.Grass)
-            .RandomAssign(Terrain.Mountain, 0.45, seed + 50)
+        Terrain[,] mountains = map_base
+            .RandomAssign(Terrain.Mountain, 0.42, seed + 50)
             .RunAutomata(Automata.Holstein, Terrain.Mountain, Terrain.Grass, 45)
             .Apply((Terrain cell, Terrain[] adjacent) => RemoveLonely(cell, adjacent, 3));
 
-        Terrain[,] forest =
-            Create(x, y, Terrain.Grass)
-            .RandomAssign(Terrain.Forest, 0.5, seed + 100)
-            .RunAutomata(Automata.Holstein, Terrain.Forest, Terrain.Grass, 20)
+        Terrain[,] forest = map_base
+            .RandomAssign(Terrain.Forest, 0.43, seed + 100)
+            .RunAutomata(Automata.Bugs, Terrain.Forest, Terrain.Grass, 20)
             .Apply((Terrain cell, Terrain[] adjacent) => RemoveLonely(cell, adjacent, 3));
 
-        Terrain[,] cells =
-            Create(x, y, Terrain.Grass)
-            .RandomAssign(Terrain.LowDensity, 0.2, seed)
+        Terrain[,] cities = map_base
+            .RandomAssign(Terrain.LowDensity, 0.22, seed + 150)
             .Border(Terrain.Grass, 5)
-            .RunAutomata(Automata.Coral, Terrain.LowDensity, Terrain.Grass, 14)
-            .RunAutomata(Automata.Smooth, Terrain.LowDensity, Terrain.Grass, 5)
+            .RunAutomata(Automata.Coral, Terrain.LowDensity, Terrain.Grass, 5)
+            .RunAutomata(Automata.Bugs, Terrain.LowDensity, Terrain.Grass, 20)
+            .RunAutomata(Automata.Smooth, Terrain.LowDensity, Terrain.Grass, 5);
 
-            .Cover(forest, [Terrain.Forest])
+        Terrain[,] cells =
+            forest
+            .Cover(cities, [Terrain.LowDensity])
             .Cover(lakes, [Terrain.Lake])
             .Cover(mountains, [Terrain.Mountain])
 
@@ -176,7 +180,7 @@ public static class MapGen
                 (Feature f) => f.Size() < 40
                             && (f.Terrain == Terrain.LowDensity
                             || f.Terrain == Terrain.Mountain), Terrain.Grass)
-            .Apply((Terrain cell, Terrain[] adjacent) => RemoveLonely(cell, adjacent, 2));
+            .Apply((Terrain cell, Terrain[] adjacent) => RemoveLonely(cell, adjacent, 3));
 
         List<Road> roads = [new Road([new(10, 10), new(10, 11), new(10, 12), new(10, 13), new(10, 14), new(11, 15), new(12, 16)])];
         return new Map(ToCells(cells), roads);
@@ -192,8 +196,8 @@ public static class MapGen
             int targetCount = counts.GetValue(target);
 
             Terrain output;
-            if (cell == target) output = automata.Born(targetCount) ? target : infill;
-            else output = automata.Survive(targetCount) ? target : cell;
+            if (cell == target) output = automata.Survive(targetCount) ? target : infill; // if cell is alive
+            else output = automata.Born(targetCount) ? target : cell; // if cell is dead
             return output;
         }
         return input.Apply(evolution, level);
@@ -385,7 +389,6 @@ public static class MapGen
             Color bottomLeft = bottom > center ? bottom.GetColor() : center.GetColor();
             return [topRight, topRight, bottomLeft, bottomLeft];
         }
-
         if (cornerTopLeft && top > center)
         {
             Color topLeft = top.GetColor();
