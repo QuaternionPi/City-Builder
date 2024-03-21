@@ -4,7 +4,20 @@ namespace CityBuilder.Map;
 
 public static class MapGen
 {
-    private enum Terrain { Unassigned = 0, Beach = 1, Grass = 2, Forest = 3, LowDensity = 4, HighDensity = 5, Lake = 6, Mountain = 7, Ocean = 8, River = 9 }
+    private enum Terrain
+    {
+        Unassigned = 0,
+        Beach = 1,
+        Grass = 2,
+        Forest = 3,
+        LowDensity = 4,
+        HighDensity = 5,
+        Lake = 6,
+        Mountain = 7,
+        Ocean = 8,
+        River = 9,
+        Icecap = 10
+    }
     private delegate Terrain Evolve(Terrain cell, Terrain[] adjacent);
     private class Feature
     {
@@ -132,11 +145,26 @@ public static class MapGen
         }
         public Func<int, bool> Born;
         public Func<int, bool> Survive;
-        public static Automata Coral { get { return new Automata((int x) => x == 3, (int x) => x >= 3); } }
-        public static Automata Smooth { get { return new Automata((int x) => x >= 5, (int x) => x >= 4); } }
-        public static Automata Holstein { get { return new Automata((int x) => x >= 5 || x == 3, (int x) => x >= 6 || x == 4); } }
-        public static Automata Bugs { get { return new Automata((int x) => x >= 3 && x != 4 && x != 8, (int x) => x >= 5 || x == 1); } }
-        public static Automata Vote { get { return new Automata((int x) => x >= 5, (int x) => x >= 4); } }
+        public static Automata Coral
+        {
+            get { return new Automata((int x) => x == 3, (int x) => x >= 3); }
+        }
+        public static Automata Smooth
+        {
+            get { return new Automata((int x) => x >= 5, (int x) => x >= 4); }
+        }
+        public static Automata Holstein
+        {
+            get { return new Automata((int x) => x >= 5 || x == 3, (int x) => x >= 6 || x == 4); }
+        }
+        public static Automata Bugs
+        {
+            get { return new Automata((int x) => x >= 3 && x != 4 && x != 8, (int x) => x >= 5 || x == 1); }
+        }
+        public static Automata Vote
+        {
+            get { return new Automata((int x) => x >= 5, (int x) => x >= 4); }
+        }
     }
     public static Map FromSeed(int x, int y, int seed)
     {
@@ -150,19 +178,23 @@ public static class MapGen
             .RunAutomata(Automata.Holstein, Terrain.Grass, Terrain.Ocean, 10)
             .RunAutomata(Automata.Coral, Terrain.Grass, Terrain.Ocean, 5)
             .RunAutomata(Automata.Bugs, Terrain.Grass, Terrain.Ocean, 20)
-            .RunAutomata(Automata.Smooth, Terrain.Grass, Terrain.Ocean, 5);
+            .RunAutomata(Automata.Coral, Terrain.Grass, Terrain.Ocean, 5);
 
         Terrain[,] lakes = map_base
-            .RandomAssign(Terrain.Lake, 0.1, seed)
+            .RandomAssign(Terrain.Lake, 0.15, seed)
             .Border(Terrain.Grass, 8)
-            .RunAutomata(Automata.Coral, Terrain.Lake, Terrain.Grass, 20)
-            .RunAutomata(Automata.Bugs, Terrain.Lake, Terrain.Grass, 5)
+            .RunAutomata(Automata.Coral, Terrain.Lake, Terrain.Grass, 10)
+            .RunAutomata(Automata.Bugs, Terrain.Lake, Terrain.Grass, 3)
             .RunAutomata(Automata.Smooth, Terrain.Lake, Terrain.Grass, 1)
             .Border(Terrain.Grass, 2);
 
         Terrain[,] mountains = map_base
-            .RandomAssign(Terrain.Mountain, 0.42, seed + 50)
-            .RunAutomata(Automata.Holstein, Terrain.Mountain, Terrain.Grass, 45)
+            .RandomAssign(Terrain.Mountain, 0.4, seed + 50)
+            .RunAutomata(Automata.Coral, Terrain.Mountain, Terrain.Grass, 1)
+            .RunAutomata(Automata.Vote, Terrain.Mountain, Terrain.Grass, 15)
+            .RunAutomata(Automata.Holstein, Terrain.Mountain, Terrain.Grass, 15)
+            .RandomAssign(Terrain.Grass, 0.3, seed + 50)
+            .RunAutomata(Automata.Holstein, Terrain.Mountain, Terrain.Grass, 15)
             .Apply((Terrain cell, Terrain[] adjacent) => RemoveLonely(cell, adjacent, 3));
 
         Terrain[,] forest = map_base
@@ -173,9 +205,11 @@ public static class MapGen
         Terrain[,] cities = map_base
             .RandomAssign(Terrain.LowDensity, 0.22, seed + 150)
             .Border(Terrain.Grass, 5)
-            .RunAutomata(Automata.Coral, Terrain.LowDensity, Terrain.Grass, 5)
-            .RunAutomata(Automata.Bugs, Terrain.LowDensity, Terrain.Grass, 20)
-            .RunAutomata(Automata.Smooth, Terrain.LowDensity, Terrain.Grass, 5);
+            .RunAutomata(Automata.Bugs, Terrain.LowDensity, Terrain.Grass, 5)
+            .RunAutomata(Automata.Coral, Terrain.LowDensity, Terrain.Grass, 10)
+            .RunAutomata(Automata.Holstein, Terrain.LowDensity, Terrain.Grass, 5)
+            .RunAutomata(Automata.Bugs, Terrain.LowDensity, Terrain.Grass, 2)
+            .RunAutomata(Automata.Smooth, Terrain.LowDensity, Terrain.Grass, 4);
 
         Terrain[,] cells =
             forest
@@ -186,9 +220,14 @@ public static class MapGen
 
             .Line(Terrain.River, river, 1)
             .ToDraft().Cull(
-                (Feature f) => f.Size() < 40
-                            && (f.Terrain == Terrain.LowDensity
-                            || f.Terrain == Terrain.Mountain), Terrain.Grass)
+                (Feature f) =>
+                    f.Size() < 50
+                    && (f.Terrain == Terrain.Mountain
+                     || f.Terrain == Terrain.Ocean
+                     || f.Terrain == Terrain.Forest
+                     || f.Terrain == Terrain.Ocean)
+                    || (f.Size() > 150 && f.Terrain == Terrain.Mountain),
+                    Terrain.Grass)
             .Apply((Terrain cell, Terrain[] adjacent) => RemoveLonely(cell, adjacent, 3));
 
         List<Road> roads = [new Road([new(10, 10), new(10, 11), new(10, 12), new(10, 13), new(10, 14), new(11, 15), new(12, 16)])];
@@ -435,18 +474,6 @@ public static class MapGen
         return output;
     }
     private static Draft ToDraft(this Terrain[,] terrain) => new(terrain);
-    private static bool Contains<T>(this T[,] input, T value)
-    {
-        if (value == null) throw new NullReferenceException("value cannot be null");
-        foreach (T t in input)
-        {
-            if (value.Equals(t))
-            {
-                return true;
-            }
-        }
-        return false;
-    }
     private static T[] Adjacent<T>(this T[,] input, int xLoc, int yLoc)
     {
         T[,] cells = Neighbourhood(input, xLoc, yLoc);
@@ -488,14 +515,14 @@ public static class MapGen
              select pair.Item1).Last();
 
     }
-    private static Terrain[,] Create(int x, int y, Terrain terrain)
+    private static T[,] Create<T>(int x, int y, T value)
     {
-        Terrain[,] output = new Terrain[x, y];
+        T[,] output = new T[x, y];
         for (int col = 0; col < x; col++)
         {
             for (int row = 0; row < y; row++)
             {
-                output[col, row] = terrain;
+                output[col, row] = value;
             }
         }
         return output;
