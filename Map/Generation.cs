@@ -21,11 +21,13 @@ public static class MapGen
     private delegate Terrain Evolve(Terrain cell, Terrain[] adjacent);
     private class Feature
     {
-        public Feature(int id)
+        public Feature(Draft parent, int id)
         {
+            Parent = parent;
             Id = id;
             _blocks = [];
         }
+        private readonly Draft Parent;
         private readonly List<Block> _blocks;
         public Terrain Terrain { get { return Blocks.First().Terrain; } }
         public IEnumerable<Block> Blocks { get { return _blocks; } }
@@ -36,6 +38,39 @@ public static class MapGen
             Block block = new(terrain, row, col, this);
             _blocks.Add(block);
             return block;
+        }
+        public List<Feature> AdjacentFeatures()
+        {
+            HashSet<Feature> features = [];
+            HashSet<(int, int)> toSearch = [];
+            int length0 = Parent.Blocks.GetLength(0);
+            int length1 = Parent.Blocks.GetLength(1);
+            foreach (Block block in Blocks)
+            {
+                var row = block.Row;
+                var col = block.Col;
+                (int, int)[] beside = [
+                    (row + 1, col),
+                    (row - 1, col),
+                    (row, col + 1),
+                    (row, col - 1)
+                ];
+                foreach (var spot in beside)
+                {
+                    var (y, x) = spot;
+                    if (0 <= y && length0 > y && 0 <= x && length1 > x)
+                    {
+                        toSearch.Add(spot);
+                    }
+                }
+            }
+            foreach (var (row, col) in toSearch)
+            {
+                var block = Parent.Blocks[row, col];
+                features.Add(block.Feature);
+            }
+            features.Remove(this);
+            return features.ToList();
         }
     }
     private class Block
@@ -63,7 +98,7 @@ public static class MapGen
             for (int i = 0; i < length; i++)
             {
                 var part = partition[i];
-                var feature = new Feature(i);
+                var feature = new Feature(this, i);
                 Features.Add(feature);
                 foreach (var item in part)
                 {
@@ -100,7 +135,7 @@ public static class MapGen
             var nodes = new List<(int, int)>(input.ItemIndexs().ToList());
             int length0 = input.GetLength(0);
             int length1 = input.GetLength(1);
-            List<(int, int)> searched = [];
+            HashSet<(int, int)> searched = [];
             List<List<(Terrain, int, int)>> partition = [];
             while (nodes.Count != 0)
             {
@@ -121,15 +156,16 @@ public static class MapGen
                         (row, col + 1),
                         (row, col - 1)
                     ];
-                    var addToSearch =
-                        from index in beside
-                        where (toSearch.Contains(index) == false)
-                           && (searched.Contains(index) == false)
-                           && 0 <= index.Item1 && length0 > index.Item1
-                           && 0 <= index.Item2 && length1 > index.Item2
-                           && (input[row, col] == input[index.Item1, index.Item2])
-                        select index;
-                    foreach (var item in addToSearch) toSearch.Push(item);
+                    foreach (var spot in beside)
+                    {
+                        var (y, x) = spot;
+                        if ((toSearch.Contains(spot) == false) && (searched.Contains(spot) == false)
+                           && 0 <= y && length0 > y && 0 <= x && length1 > x
+                           && (input[row, col] == input[y, x]))
+                        {
+                            toSearch.Push(spot);
+                        }
+                    }
                 }
                 partition.Add(part);
             }
@@ -209,7 +245,7 @@ public static class MapGen
         Terrain[,] cities = map_base
             .RandomAssign(Terrain.LowDensity, 0.22, seed + 150)
             .Border(Terrain.Grass, 5)
-            .RunAutomataChain(Terrain.Mountain, Terrain.Grass, [
+            .RunAutomataChain(Terrain.LowDensity, Terrain.Grass, [
                 (Automata.Bugs, 5),
                 (Automata.Coral, 10),
                 (Automata.Holstein, 5),
@@ -217,22 +253,29 @@ public static class MapGen
                 (Automata.Smooth, 4),
             ]);
 
+        var cullSize = (Feature f) =>
+                f.Size() < 50
+            && (f.Terrain == Terrain.Mountain
+             || f.Terrain == Terrain.Ocean
+             || f.Terrain == Terrain.Forest
+             || f.Terrain == Terrain.Ocean)
+             || (f.Size() > 150 && f.Terrain == Terrain.Mountain);
+
+        var cullOcean = (Feature f) =>
+                f.Terrain == Terrain.Lake
+            && f.AdjacentFeatures()
+                .Select((Feature f1) => f1.Terrain)
+                .Contains(Terrain.Ocean);
+
         Terrain[,] cells =
             forest
             .Cover(cities, [Terrain.LowDensity])
             .Cover(lakes, [Terrain.Lake])
             .Cover(mountains, [Terrain.Mountain])
             .Cover(continents, [Terrain.Ocean])
-            .ToDraft().Cull(
-                (Feature f) =>
-                    f.Size() < 50
-                    && (f.Terrain == Terrain.Mountain
-                     || f.Terrain == Terrain.Ocean
-                     || f.Terrain == Terrain.Forest
-                     || f.Terrain == Terrain.Ocean)
-                     || (f.Size() > 150 && f.Terrain == Terrain.Mountain),
-                    Terrain.Grass)
-            .Apply((Terrain cell, Terrain[] adjacent) => RemoveLonely(cell, adjacent, 3));
+            .ToDraft().Cull(cullSize, Terrain.Grass)
+            .Apply((Terrain cell, Terrain[] adjacent) => RemoveLonely(cell, adjacent, 3))
+            .ToDraft().Cull(cullOcean, Terrain.Ocean);
 
         return new Map(ToCells(cells), []);
     }
