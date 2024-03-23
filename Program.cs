@@ -23,7 +23,7 @@ public static class Program
         while (!Window.ShouldClose())
         {
             graphics.BeginDrawing();
-            graphics.ClearBackground(Color.RAYWHITE);
+            graphics.ClearBackground(Color.RayWhite);
             map.Draw(graphics);
             graphics.EndDrawing();
 

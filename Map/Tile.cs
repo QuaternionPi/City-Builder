@@ -32,7 +32,7 @@ public class Tile
     {
         Color color;
         if (Zone != null) color = Zone.Color;
-        else color = Color.GRAY;
+        else color = Color.Gray;
         graphics.Triangle(Triangle, color);
     }
 }

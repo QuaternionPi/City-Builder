@@ -26,7 +26,7 @@ public class Road
     {
         foreach (Line line in Lines)
         {
-            graphics.Line(line, Size, Color.BLACK);
+            graphics.Line(line, Size, Color.Black);
         }
     }
 }

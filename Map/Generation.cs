@@ -503,7 +503,7 @@ public static class MapGen
         int x = input.GetLength(0);
         int y = input.GetLength(1);
 
-        Zone city = new Zone(Color.ORANGE, "City");
+        Zone city = new Zone(Color.Orange, "City");
 
         Cell[,] output = new Cell[x, y];
         for (int col = 0; col < x; col++)
@@ -586,19 +586,5 @@ public static class MapGen
         Terrain.HighDensity => Land.HighDensity,
         Terrain.Icecap => Land.Icecap,
         _ => throw new Exception($"Cannot conver {terrain} to land"),
-    };
-    private static Color ToColor(this Terrain terrain) => terrain switch
-    {
-        Terrain.Ocean => Color.DARKBLUE,
-        Terrain.River => Color.BLUE,
-        Terrain.Lake => new Color(88, 88, 255, 255),
-        Terrain.Beach => new Color(255, 216, 146, 255),
-        Terrain.Grass => Color.GREEN,
-        Terrain.Forest => Color.DARKGREEN,
-        Terrain.Mountain => Color.LIGHTGRAY,
-        Terrain.LowDensity => Color.GRAY,
-        Terrain.HighDensity => Color.DARKGRAY,
-        Terrain.Icecap => Color.WHITE,
-        _ => Color.BLACK,
     };
 }
