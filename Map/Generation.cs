@@ -416,12 +416,12 @@ public static class MapGen
         }
         return output;
     }
-    private static Color[] CellColorsBasic(Terrain[,] input)
+    private static Terrain[] CellsBasic(Terrain[,] input)
     {
-        Color color = input[1, 1].GetColor();
-        return [color, color, color, color];
+        Terrain terrain = input[1, 1];
+        return [terrain, terrain, terrain, terrain];
     }
-    private static Color[] CellColorsSmooth(Terrain[,] input)
+    private static Terrain[] CellsSmooth(Terrain[,] input)
     {
         if (input.GetLength(0) != 3 || input.GetLength(1) != 3) throw new Exception("Input array must be 3x3");
         Terrain center = input[1, 1];
@@ -433,8 +433,7 @@ public static class MapGen
         bool allSame = top == left && top == right && top == bottom;
         if (allSame == true)
         {
-            Color primary = center.GetColor();
-            return [primary, primary, primary, primary];
+            return [center, center, center, center];
         }
 
         bool threeSameTop = top == left && top == right;
@@ -444,27 +443,19 @@ public static class MapGen
 
         if (threeSameTop && top > center)
         {
-            Color primary = top.GetColor();
-            Color secondary = center.GetColor();
-            return [primary, primary, secondary, primary];
+            return [top, top, center, top];
         }
         if (threeSameRight && right > center)
         {
-            Color primary = right.GetColor();
-            Color secondary = center.GetColor();
-            return [primary, primary, primary, secondary];
+            return [right, right, right, center];
         }
         if (threeSameBottom && bottom > center)
         {
-            Color primary = bottom.GetColor();
-            Color secondary = center.GetColor();
-            return [secondary, primary, primary, primary];
+            return [center, bottom, bottom, bottom];
         }
         if (threeSameLeft && left > center)
         {
-            Color primary = left.GetColor();
-            Color secondary = center.GetColor();
-            return [primary, secondary, primary, primary];
+            return [left, center, left, left];
         }
 
         bool cornerTopLeft = top == left;
@@ -474,44 +465,45 @@ public static class MapGen
 
         if (cornerTopLeft && cornerBottomRight && (top > center || bottom > center))
         {
-            Color topLeft = top > center ? top.GetColor() : center.GetColor();
-            Color bottomRight = bottom > center ? bottom.GetColor() : center.GetColor();
+            Terrain topLeft = top > center ? top : center;
+            Terrain bottomRight = bottom > center ? bottom : center;
             return [topLeft, bottomRight, bottomRight, topLeft];
         }
         if (cornerTopRight && cornerBottomLeft && (top > center || bottom > center))
         {
-            Color topRight = top > center ? top.GetColor() : center.GetColor();
-            Color bottomLeft = bottom > center ? bottom.GetColor() : center.GetColor();
+            Terrain topRight = top > center ? top : center;
+            Terrain bottomLeft = bottom > center ? bottom : center;
             return [topRight, topRight, bottomLeft, bottomLeft];
         }
         if (cornerTopLeft && top > center)
         {
-            Color topLeft = top.GetColor();
-            return [topLeft, center.GetColor(), center.GetColor(), topLeft];
+            Terrain topLeft = top;
+            return [topLeft, center, center, topLeft];
         }
         if (cornerTopRight && top > center)
         {
-            Color topRight = top.GetColor();
-            return [topRight, topRight, center.GetColor(), center.GetColor()];
+            Terrain topRight = top;
+            return [topRight, topRight, center, center];
         }
         if (cornerBottomLeft && bottom > center)
         {
-            Color bottomLeft = bottom.GetColor();
-            return [center.GetColor(), center.GetColor(), bottomLeft, bottomLeft];
+            Terrain bottomLeft = bottom;
+            return [center, center, bottomLeft, bottomLeft];
         }
         if (cornerBottomRight && bottom > center)
         {
-            Color bottomRight = bottom.GetColor();
-            return [center.GetColor(), bottomRight, bottomRight, center.GetColor()];
+            Terrain bottomRight = bottom;
+            return [center, bottomRight, bottomRight, center];
         }
 
-        Color color = center.GetColor();
-        return [color, color, color, color];
+        return [center, center, center, center];
     }
     private static Cell[,] ToCells(this Terrain[,] input)
     {
         int x = input.GetLength(0);
         int y = input.GetLength(1);
+
+        Zone city = new Zone(Color.ORANGE, "City");
 
         Cell[,] output = new Cell[x, y];
         for (int col = 0; col < x; col++)
@@ -519,8 +511,10 @@ public static class MapGen
             for (int row = 0; row < y; row++)
             {
                 Terrain[,] neighbourhood = Neighbourhood(input, col, row);
-                Color[] colors = CellColorsSmooth(neighbourhood);
-                output[col, row] = new Cell(col, row, colors);
+                Terrain[] terrains = CellsSmooth(neighbourhood);
+                Land[] lands = terrains.Select((t) => t.ToLand()).ToArray();
+                Zone?[] zones = terrains.Select((t) => t == Terrain.LowDensity ? city : null).ToArray();
+                output[col, row] = new Cell(col, row, lands, zones);
             }
         }
         return output;
@@ -579,7 +573,21 @@ public static class MapGen
         }
         return output;
     }
-    private static Color GetColor(this Terrain Terrain) => Terrain switch
+    private static Land ToLand(this Terrain terrain) => terrain switch
+    {
+        Terrain.Ocean => Land.Ocean,
+        Terrain.River => Land.River,
+        Terrain.Lake => Land.Lake,
+        Terrain.Beach => Land.Beach,
+        Terrain.Grass => Land.Grass,
+        Terrain.Forest => Land.Forest,
+        Terrain.Mountain => Land.Mountain,
+        Terrain.LowDensity => Land.LowDensity,
+        Terrain.HighDensity => Land.HighDensity,
+        Terrain.Icecap => Land.Icecap,
+        _ => throw new Exception($"Cannot conver {terrain} to land"),
+    };
+    private static Color ToColor(this Terrain terrain) => terrain switch
     {
         Terrain.Ocean => Color.DARKBLUE,
         Terrain.River => Color.BLUE,
@@ -587,9 +595,10 @@ public static class MapGen
         Terrain.Beach => new Color(255, 216, 146, 255),
         Terrain.Grass => Color.GREEN,
         Terrain.Forest => Color.DARKGREEN,
-        Terrain.Mountain => Color.WHITE,
+        Terrain.Mountain => Color.LIGHTGRAY,
         Terrain.LowDensity => Color.GRAY,
         Terrain.HighDensity => Color.DARKGRAY,
+        Terrain.Icecap => Color.WHITE,
         _ => Color.BLACK,
     };
 }

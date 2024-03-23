@@ -6,7 +6,7 @@ namespace CityBuilder.Map;
 public class Cell
 {
     private const int Size = 5;
-    public Cell(int col, int row, Color[] color)
+    public Cell(int col, int row, Land[] lands, Zone?[] zones)
     {
         Center = (new Vector2(col, row) * 2 + Vector2.One) * Size;
         Dimensions = new Vector2(2, 2) * Size;
@@ -21,10 +21,10 @@ public class Cell
         Triangle bottom = Triangle.Clockwise(Center, bottomLeft, bottomRight);
         Triangle left = Triangle.Clockwise(Center, topLeft, bottomLeft);
 
-        Top = new Tile(top, new Land(color[0], false));
-        Right = new Tile(right, new Land(color[1], false));
-        Bottom = new Tile(bottom, new Land(color[2], false));
-        Left = new Tile(left, new Land(color[3], false));
+        Top = new Tile(top, lands[0], zones[0]);
+        Right = new Tile(right, lands[1], zones[1]);
+        Bottom = new Tile(bottom, lands[2], zones[2]);
+        Left = new Tile(left, lands[3], zones[3]);
     }
     private readonly Vector2 Center;
     private readonly Vector2 Dimensions;

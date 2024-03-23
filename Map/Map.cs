@@ -24,6 +24,42 @@ public interface IMapMode
     public void Update(IKeyboard keyboard, IMouse mouse, float deltaTime);
     public void Draw(IGraphics graphics);
 }
+public interface IMapDraw
+{
+    public void Draw(IGraphics graphics);
+}
+public class MapDrawLand : IMapDraw
+{
+    private readonly Map Map;
+    public MapDrawLand(Map map)
+    {
+        Map = map;
+    }
+    public void Draw(IGraphics graphics)
+    {
+        foreach (var tile in Map.Tiles) tile.DrawLand(graphics);
+        foreach (var road in Map.Roads)
+        {
+            road.Draw(graphics);
+        }
+    }
+}
+public class MapDrawZone : IMapDraw
+{
+    private readonly Map Map;
+    public MapDrawZone(Map map)
+    {
+        Map = map;
+    }
+    public void Draw(IGraphics graphics)
+    {
+        foreach (var tile in Map.Tiles) tile.DrawZone(graphics);
+        foreach (var road in Map.Roads)
+        {
+            road.Draw(graphics);
+        }
+    }
+}
 public class MapDisplay : IMapMode
 {
     private readonly Map Map;
@@ -44,26 +80,34 @@ public class MapDisplay : IMapMode
 public class MapPaint : IMapMode
 {
     private readonly Map Map;
+    private IMapDraw MapDraw;
     private readonly List<TextButton> Buttons;
     public MapPaint(Map map)
     {
+        MapDraw = new MapDrawLand(map);
         Map = map;
         Buttons = [ new TextButton(
                 new TextButton.Prototype()
                     .SetShape(new Rectangle(new Vector2(200, 100), new Vector2(100, 20)))
-                    .SetText("Button", 40)
+                    .SetText("Change View", 40)
                     .SetColors(Color.BLACK,new Color(220, 220, 220, 127)),
                 new TextButton.Prototype()
                     .SetShape(new Rectangle(new Vector2(200, 100), new Vector2(100, 20)))
-                    .SetText("Button", 40)
+                    .SetText("Change View", 40)
                     .SetColors(Color.BLACK,new Color(220, 220, 220, 255))
             ) ];
-        Buttons[0].Clicked += PrintMessage;
+        Buttons[0].Clicked += ChangeView;
     }
-    static void PrintMessage(MouseButton button)
+    void ChangeView(MouseButton button)
     {
-        string message = "message";
-        Console.WriteLine(message);
+        if (MapDraw is MapDrawZone)
+        {
+            MapDraw = new MapDrawLand(Map);
+        }
+        else
+        {
+            MapDraw = new MapDrawZone(Map);
+        }
     }
     private void Paint(Vector2 position, Land land)
     {
@@ -98,11 +142,7 @@ public class MapPaint : IMapMode
     }
     public void Draw(IGraphics graphics)
     {
-        foreach (var tile in Map.Tiles) tile.DrawLand(graphics);
-        foreach (var road in Map.Roads)
-        {
-            road.Draw(graphics);
-        }
+        MapDraw.Draw(graphics);
         foreach (var button in Buttons)
         {
             button.Draw(graphics);
