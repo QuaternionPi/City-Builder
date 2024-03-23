@@ -41,8 +41,8 @@ public class TextButton
         private readonly Font Font;
         public Prototype()
         {
-            TextColor = Color.BLACK;
-            BackgroundColor = Color.RAYWHITE;
+            TextColor = Color.Black;
+            BackgroundColor = Color.RayWhite;
             Text = "";
             Size = 10;
             Shape = new Rectangle(Vector2.Zero, Vector2.Zero);
