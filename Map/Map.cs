@@ -88,46 +88,42 @@ public class MapPaint : IMapMode
         Land = Land.Ocean;
         MapDraw = new MapDrawLand(map);
         Map = map;
+        TextButton.Prototype transparent = new TextButton.Prototype()
+            .SetColors(Color.Black, new Color(220, 220, 220, 127));
+        TextButton.Prototype solid = new TextButton.Prototype()
+            .SetColors(Color.Black, new Color(220, 220, 220, 255));
         Buttons = [
             new TextButton(
-                new TextButton.Prototype()
+                transparent
+                    .SetShape(new Rectangle(new Vector2(60, 20), new Vector2(100, 20)))
+                    .SetText("Change View", 40),
+                solid
                     .SetShape(new Rectangle(new Vector2(60, 20), new Vector2(100, 20)))
                     .SetText("Change View", 40)
-                    .SetColors(Color.Black,new Color(220, 220, 220, 127)),
-                new TextButton.Prototype()
-                    .SetShape(new Rectangle(new Vector2(60, 20), new Vector2(100, 20)))
-                    .SetText("Change View", 40)
-                    .SetColors(Color.Black,new Color(220, 220, 220, 255))
             ),
             new TextButton(
-                new TextButton.Prototype()
+                transparent
+                    .SetShape(new Rectangle(new Vector2(60, 50), new Vector2(100, 20)))
+                    .SetText("Paint Ocean", 40),
+                solid
                     .SetShape(new Rectangle(new Vector2(60, 50), new Vector2(100, 20)))
                     .SetText("Paint Ocean", 40)
-                    .SetColors(Color.Black,new Color(220, 220, 220, 127)),
-                new TextButton.Prototype()
-                    .SetShape(new Rectangle(new Vector2(60, 50), new Vector2(100, 20)))
-                    .SetText("Paint Ocean", 40)
-                    .SetColors(Color.Black,new Color(220, 220, 220, 255))
             ),
             new TextButton(
-                new TextButton.Prototype()
+                transparent
+                    .SetShape(new Rectangle(new Vector2(60, 80), new Vector2(100, 20)))
+                    .SetText("Paint Grass", 40),
+               solid
                     .SetShape(new Rectangle(new Vector2(60, 80), new Vector2(100, 20)))
                     .SetText("Paint Grass", 40)
-                    .SetColors(Color.Black,new Color(220, 220, 220, 127)),
-                new TextButton.Prototype()
-                    .SetShape(new Rectangle(new Vector2(60, 80), new Vector2(100, 20)))
-                    .SetText("Paint Grass", 40)
-                    .SetColors(Color.Black,new Color(220, 220, 220, 255))
             ),
             new TextButton(
-                new TextButton.Prototype()
+                transparent
+                    .SetShape(new Rectangle(new Vector2(60, 110), new Vector2(100, 20)))
+                    .SetText("Paint Forest", 40),
+                solid
                     .SetShape(new Rectangle(new Vector2(60, 110), new Vector2(100, 20)))
                     .SetText("Paint Forest", 40)
-                    .SetColors(Color.Black,new Color(220, 220, 220, 127)),
-                new TextButton.Prototype()
-                    .SetShape(new Rectangle(new Vector2(60, 110), new Vector2(100, 20)))
-                    .SetText("Paint Forest", 40)
-                    .SetColors(Color.Black,new Color(220, 220, 220, 255))
             )];
         Buttons[0].Clicked += ChangeView;
         Buttons[1].Clicked += (MouseButton button) => Land = Land.Ocean;
