@@ -2,6 +2,11 @@ namespace CityBuilder.Geometry;
 
 public readonly struct Vector2 : IEquatable<Vector2>
 {
+    public Vector2(double x, double y)
+    {
+        X = (float)x;
+        Y = (float)y;
+    }
     public Vector2(float x, float y)
     {
         X = x;
