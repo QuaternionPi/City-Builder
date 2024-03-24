@@ -1,3 +1,4 @@
+using CityBuilder.Map.Structures;
 using CityBuilder.Geometry;
 using CityBuilder.IO;
 
@@ -8,11 +9,15 @@ public class Tile
     private readonly Triangle Triangle;
     private Land Land;
     private Zone? Zone;
-    public Tile(Triangle triangle, Land land, Zone? zone = null)
+    private List<IStructure> Structures;
+    public Tile(Triangle triangle, Land land, Zone? zone, IEnumerable<IStructure> structures)
     {
         Triangle = triangle;
         Land = land;
         Zone = zone;
+        Structures = structures.ToList();
+        foreach (IStructure structure in structures)
+            structure.Position = Triangle.Center;
     }
     public void Paint(Land land)
     {
@@ -27,6 +32,11 @@ public class Tile
     public void DrawLand(IGraphics graphics)
     {
         graphics.Triangle(Triangle, Land.Color);
+    }
+    public void DrawFeaures(IGraphics graphics)
+    {
+        foreach (var structure in Structures)
+            structure.Draw(graphics);
     }
     public void DrawZone(IGraphics graphics)
     {

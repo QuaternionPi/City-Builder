@@ -31,7 +31,7 @@ public readonly struct Triangle : IPolygon
     public readonly Vector2 P2;
     public readonly Vector2 P3;
     public readonly Vector2[] Points { get { return [P1, P2, P3]; } }
-    public readonly Vector2 Center { get { return (P1 + P2 + P3) / 2; } }
+    public readonly Vector2 Center { get { return (P1 + P2 + P3) / 3; } }
     public static Triangle Clockwise(Vector2 p1, Vector2 p2, Vector2 p3)
     {
         float slope1 = (p2.Y - p1.Y) * (p3.X - p2.X);

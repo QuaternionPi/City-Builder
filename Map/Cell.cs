@@ -1,3 +1,4 @@
+using CityBuilder.Map.Structures;
 using CityBuilder.Geometry;
 using CityBuilder.IO;
 
@@ -6,7 +7,7 @@ namespace CityBuilder.Map;
 public class Cell
 {
     private const int Size = 5;
-    public Cell(int col, int row, Land[] lands, Zone?[] zones)
+    public Cell(int col, int row, IList<Land> lands, IList<Zone?> zones, IList<IEnumerable<IStructure>> structures)
     {
         Center = (new Vector2(col, row) * 2 + Vector2.One) * Size;
         Dimensions = new Vector2(2, 2) * Size;
@@ -21,10 +22,10 @@ public class Cell
         Triangle bottom = Triangle.Clockwise(Center, bottomLeft, bottomRight);
         Triangle left = Triangle.Clockwise(Center, topLeft, bottomLeft);
 
-        Top = new Tile(top, lands[0], zones[0]);
-        Right = new Tile(right, lands[1], zones[1]);
-        Bottom = new Tile(bottom, lands[2], zones[2]);
-        Left = new Tile(left, lands[3], zones[3]);
+        Top = new Tile(top, lands[0], zones[0], structures[0]);
+        Right = new Tile(right, lands[1], zones[1], structures[1]);
+        Bottom = new Tile(bottom, lands[2], zones[2], structures[2]);
+        Left = new Tile(left, lands[3], zones[3], structures[3]);
     }
     private readonly Vector2 Center;
     private readonly Vector2 Dimensions;

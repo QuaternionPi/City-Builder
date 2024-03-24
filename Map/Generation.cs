@@ -1,4 +1,5 @@
 using CityBuilder.Geometry;
+using CityBuilder.Map.Structures;
 
 namespace CityBuilder.Map;
 
@@ -512,9 +513,19 @@ public static class MapGen
             {
                 Terrain[,] neighbourhood = Neighbourhood(input, col, row);
                 Terrain[] terrains = CellsSmooth(neighbourhood);
-                Land[] lands = terrains.Select((t) => t.ToLand()).ToArray();
-                Zone?[] zones = terrains.Select((t) => t == Terrain.LowDensity ? city : null).ToArray();
-                output[col, row] = new Cell(col, row, lands, zones);
+                Land[] lands = terrains.Select((t) =>
+                    t.ToLand()).ToArray();
+                Zone?[] zones = terrains.Select((t) =>
+                    t == Terrain.LowDensity ? city : null).ToArray();
+                List<IEnumerable<IStructure>> structures = terrains.Select((t) =>
+                    (IEnumerable<IStructure>)(
+                        t == Terrain.Forest
+                        ? [new Tree()]
+                        : []
+                    )
+                ).ToList();
+
+                output[col, row] = new Cell(col, row, lands, zones, structures);
             }
         }
         return output;

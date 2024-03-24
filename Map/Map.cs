@@ -38,10 +38,8 @@ public class MapDrawLand : IMapDraw
     public void Draw(IGraphics graphics)
     {
         foreach (var tile in Map.Tiles) tile.DrawLand(graphics);
-        foreach (var road in Map.Roads)
-        {
-            road.Draw(graphics);
-        }
+        foreach (var tile in Map.Tiles) tile.DrawFeaures(graphics);
+        foreach (var road in Map.Roads) road.Draw(graphics);
     }
 }
 public class MapDrawZone : IMapDraw
@@ -54,10 +52,7 @@ public class MapDrawZone : IMapDraw
     public void Draw(IGraphics graphics)
     {
         foreach (var tile in Map.Tiles) tile.DrawZone(graphics);
-        foreach (var road in Map.Roads)
-        {
-            road.Draw(graphics);
-        }
+        foreach (var road in Map.Roads) road.Draw(graphics);
     }
 }
 public class MapDisplay : IMapMode
@@ -71,10 +66,8 @@ public class MapDisplay : IMapMode
     public void Draw(IGraphics graphics)
     {
         foreach (var tile in Map.Tiles) tile.DrawLand(graphics);
-        foreach (var road in Map.Roads)
-        {
-            road.Draw(graphics);
-        }
+        foreach (var tile in Map.Tiles) tile.DrawFeaures(graphics);
+        foreach (var road in Map.Roads) road.Draw(graphics);
     }
 }
 public class MapPaint : IMapMode
