@@ -5,12 +5,14 @@ namespace CityBuilder.Map;
 
 public class Map
 {
-    private IMapMode Mode;
-    public readonly Cell[,] Cells;
+    public Camera Camera;
     public IEnumerable<Tile> Tiles { get { return from cell in Cells from tile in cell.Tiles select tile; } }
+    public readonly Cell[,] Cells;
     public List<Road> Roads { get; protected set; }
+    private IMapMode Mode;
     public Map(Cell[,] cells, List<Road> roads)
     {
+        Camera = new Camera(Vector2.Zero, Vector2.Zero, 0, 1);
         Cells = cells;
         Roads = roads;
         Mode = new MapPaint(this);
@@ -37,10 +39,12 @@ public class MapDrawLand : IMapDraw
     }
     public void Draw(IGraphics graphics)
     {
+        graphics.BeginMode2D(Map.Camera);
         foreach (var tile in Map.Tiles) tile.DrawLand(graphics);
         foreach (var tile in Map.Tiles) tile.DrawFeaures(graphics);
         foreach (var road in Map.Roads) road.Draw(graphics);
         foreach (var tile in Map.Tiles) tile.DrawFeaureLabel(graphics);
+        graphics.EndMode2D();
     }
 }
 public class MapDrawZone : IMapDraw
@@ -54,22 +58,6 @@ public class MapDrawZone : IMapDraw
     {
         foreach (var tile in Map.Tiles) tile.DrawZone(graphics);
         foreach (var road in Map.Roads) road.Draw(graphics);
-    }
-}
-public class MapDisplay : IMapMode
-{
-    private readonly Map Map;
-    public MapDisplay(Map map)
-    {
-        Map = map;
-    }
-    public void Update(IKeyboard keyboard, IMouse mouse, float deltaTime) { }
-    public void Draw(IGraphics graphics)
-    {
-        foreach (var tile in Map.Tiles) tile.DrawLand(graphics);
-        foreach (var tile in Map.Tiles) tile.DrawFeaures(graphics);
-        foreach (var road in Map.Roads) road.Draw(graphics);
-        foreach (var tile in Map.Tiles) tile.DrawFeaureLabel(graphics);
     }
 }
 public class MapPaint : IMapMode
