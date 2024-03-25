@@ -32,3 +32,30 @@ public readonly struct Camera
         Zoom = (float)zoom;
     }
 }
+
+public class CameraMount
+{
+    public Camera Camera
+    {
+        get
+        {
+            return new Camera(
+                Vector2.Zero,
+                PositionActual,
+                0,
+                1
+            );
+        }
+    }
+    public float Speed;
+    private Vector2 PositionActual { get; set; }
+    public Vector2 Position { get; set; }
+    public CameraMount(Vector2 position, float speed = 1)
+    {
+        Position = position;
+        PositionActual = position;
+        Speed = speed;
+    }
+    public void Update(float deltaTime) =>
+        PositionActual = Vector2.LerpClamped(PositionActual, Position, deltaTime * Speed);
+}

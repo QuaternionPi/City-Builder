@@ -7,7 +7,7 @@ public static class Program
     public static void Main(string[] args)
     {
         int fps = 60;
-        float deltaTime = 1 / fps;
+        float deltaTime = (float)1 / fps;
 
         Window.SetTargetFPS(fps);
         Window.SetConfigFlags(Raylib_cs.ConfigFlags.FLAG_MSAA_4X_HINT);

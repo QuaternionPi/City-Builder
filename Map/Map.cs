@@ -6,14 +6,15 @@ namespace CityBuilder.Map;
 
 public class Map
 {
-    public Camera Camera;
+    public Camera Camera { get { return CameraMount.Camera; } }
+    public CameraMount CameraMount { get; }
     public IEnumerable<Tile> Tiles { get { return from cell in Cells from tile in cell.Tiles select tile; } }
     public readonly Cell[,] Cells;
     public List<Road> Roads { get; protected set; }
     private IMapMode Mode;
     public Map(Cell[,] cells, List<Road> roads)
     {
-        Camera = new Camera(Vector2.Zero, Vector2.Zero, 0, 1);
+        CameraMount = new CameraMount(Vector2.Zero, 3);
         Cells = cells;
         Roads = roads;
         Mode = new MapPaint(this);
@@ -152,9 +153,27 @@ public class MapPaint : IMapMode
         foreach (var tile in Map.Tiles)
             (keyboard, mouse) = tile.Update(keyboard, mouse, deltaTime);
 
+        if (keyboard.IsKeyDown(KeyboardKey.W))
+        {
+            Map.CameraMount.Position -= Vector2.UnitY;
+        }
+        if (keyboard.IsKeyDown(KeyboardKey.S))
+        {
+            Map.CameraMount.Position += Vector2.UnitY;
+        }
+        if (keyboard.IsKeyDown(KeyboardKey.A))
+        {
+            Map.CameraMount.Position -= Vector2.UnitX;
+        }
+        if (keyboard.IsKeyDown(KeyboardKey.D))
+        {
+            Map.CameraMount.Position += Vector2.UnitX;
+        }
+
         Land land = Land;
         if (mouse.IsButtonDown(MouseButton.Left))
             Paint(mouse.Position, land);
+        Map.CameraMount.Update(deltaTime);
     }
     public void Draw(IGraphics graphics)
     {
