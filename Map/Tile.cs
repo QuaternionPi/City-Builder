@@ -29,6 +29,12 @@ public class Tile
     }
     public bool Collidies(Collider collider) => Collider.Collidies(new Collider(Triangle), collider);
     public bool Collidies(Vector2 point) => Collider.Collidies(new Collider(Triangle), point);
+    public (IKeyboard, IMouse) Update(IKeyboard keyboard, IMouse mouse, float deltaTime)
+    {
+        foreach (var structure in Structures)
+            (keyboard, mouse) = structure.Update(keyboard, mouse, deltaTime);
+        return (keyboard, mouse);
+    }
     public void DrawLand(IGraphics graphics)
     {
         graphics.Triangle(Triangle, Land.Color);
@@ -37,6 +43,11 @@ public class Tile
     {
         foreach (var structure in Structures)
             structure.Draw(graphics);
+    }
+    public void DrawFeaureLabel(IGraphics graphics)
+    {
+        foreach (var structure in Structures)
+            structure.DrawLabel(graphics);
     }
     public void DrawZone(IGraphics graphics)
     {

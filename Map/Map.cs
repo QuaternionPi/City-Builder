@@ -40,6 +40,7 @@ public class MapDrawLand : IMapDraw
         foreach (var tile in Map.Tiles) tile.DrawLand(graphics);
         foreach (var tile in Map.Tiles) tile.DrawFeaures(graphics);
         foreach (var road in Map.Roads) road.Draw(graphics);
+        foreach (var tile in Map.Tiles) tile.DrawFeaureLabel(graphics);
     }
 }
 public class MapDrawZone : IMapDraw
@@ -68,6 +69,7 @@ public class MapDisplay : IMapMode
         foreach (var tile in Map.Tiles) tile.DrawLand(graphics);
         foreach (var tile in Map.Tiles) tile.DrawFeaures(graphics);
         foreach (var road in Map.Roads) road.Draw(graphics);
+        foreach (var tile in Map.Tiles) tile.DrawFeaureLabel(graphics);
     }
 }
 public class MapPaint : IMapMode
@@ -157,9 +159,9 @@ public class MapPaint : IMapMode
     public void Update(IKeyboard keyboard, IMouse mouse, float deltaTime)
     {
         foreach (TextButton button in Buttons)
-        {
             (keyboard, mouse) = button.Update(keyboard, mouse, deltaTime);
-        }
+        foreach (var tile in Map.Tiles)
+            (keyboard, mouse) = tile.Update(keyboard, mouse, deltaTime);
 
         Land land = Land;
         if (mouse.IsButtonDown(MouseButton.Left))
