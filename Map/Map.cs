@@ -81,9 +81,9 @@ public class MapPaint : IMapMode
         Land = Land.Ocean;
         MapDraw = new MapDrawLand(map);
         Map = map;
-        TextButton.Prototype transparent = new TextButton.Prototype()
+        Label transparent = new Label()
             .SetColors(Color.Black, new Color(220, 220, 220, 127));
-        TextButton.Prototype solid = new TextButton.Prototype()
+        Label solid = new Label()
             .SetColors(Color.Black, new Color(220, 220, 220, 255));
         Buttons = [
             new TextButton(
