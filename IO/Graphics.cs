@@ -3,53 +3,6 @@ using CityBuilder.Geometry;
 
 namespace CityBuilder.IO;
 
-public class Font
-{
-    private Raylib_cs.Font Value;
-    public static implicit operator Raylib_cs.Font(CityBuilder.IO.Font font) { return font.Value; }
-    private Font(Raylib_cs.Font font)
-    {
-        Value = font;
-    }
-    public Vector2 MeasureText(string text, float fontSize, float spacing)
-    {
-        System.Numerics.Vector2 systemVector = Raylib_cs.Raylib.MeasureTextEx(Value, text, fontSize, spacing);
-        return new Vector2(systemVector.X, systemVector.Y);
-    }
-    public static Font DefaultFont() => new Font(Raylib_cs.Raylib.GetFontDefault());
-}
-
-public readonly struct Camera
-{
-    private static System.Numerics.Vector2 SystemVector(Vector2 vector) => new System.Numerics.Vector2(vector.X, vector.Y);
-    public static implicit operator Raylib_cs.Camera2D(Camera camera) => new Raylib_cs.Camera2D(SystemVector(camera.Offset), SystemVector(camera.Target), (float)camera.Rotation, camera.Zoom);
-    public readonly Vector2 Offset;
-    public readonly Vector2 Target;
-    public readonly Degree Rotation;
-    public readonly float Zoom;
-    public Camera()
-    {
-        Offset = Vector2.Zero;
-        Target = Vector2.Zero;
-        Rotation = 0;
-        Zoom = 1;
-    }
-    public Camera(Vector2 offset, Vector2 target, Degree rotation, float zoom)
-    {
-        Offset = offset;
-        Target = target;
-        Rotation = rotation;
-        Zoom = zoom;
-    }
-    public Camera(Vector2 offset, Vector2 target, Degree rotation, double zoom)
-    {
-        Offset = offset;
-        Target = target;
-        Rotation = rotation;
-        Zoom = (float)zoom;
-    }
-}
-
 public interface IGraphics
 {
     void ClearBackground(Color color);
