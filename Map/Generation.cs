@@ -1,4 +1,4 @@
-using CityBuilder.Geometry;
+using CityBuilder.Numerics;
 using CityBuilder.Map.Structures;
 
 namespace CityBuilder.Map;

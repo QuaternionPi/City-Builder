@@ -1,5 +1,6 @@
-using CityBuilder.Map.Structures;
+using CityBuilder.Numerics;
 using CityBuilder.Geometry;
+using CityBuilder.Map.Structures;
 using CityBuilder.IO;
 
 namespace CityBuilder.Map;

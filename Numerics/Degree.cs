@@ -1,4 +1,4 @@
-namespace CityBuilder.Geometry;
+namespace CityBuilder.Numerics;
 
 public readonly struct Degree(double value) : IEquatable<Degree>
 {

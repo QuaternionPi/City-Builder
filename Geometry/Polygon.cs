@@ -1,3 +1,5 @@
+using CityBuilder.Numerics;
+
 namespace CityBuilder.Geometry;
 
 public interface IPolygon

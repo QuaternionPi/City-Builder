@@ -1,3 +1,4 @@
+using CityBuilder.Numerics;
 using CityBuilder.Map.Structures;
 using CityBuilder.Geometry;
 using CityBuilder.IO;

@@ -1,4 +1,4 @@
-namespace CityBuilder.Geometry;
+namespace CityBuilder.Numerics;
 
 public readonly struct Radian(double value) : IEquatable<Radian>
 {
