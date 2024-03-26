@@ -7,12 +7,11 @@ namespace CityBuilder.Map;
 
 public class Cell
 {
-    private const int Size = 5;
     public Cell(int col, int row, IList<Land> lands, IList<Zone?> zones, IList<IEnumerable<IStructure>> structures)
     {
-        Center = (new Vector2(col, row) * 2 + Vector2.One) * Size;
-        Dimensions = new Vector2(2, 2) * Size;
-        float delta = Size;
+        Center = (new Vector2(col, row) * 2 + Vector2.One);
+        Dimensions = new Vector2(2, 2);
+        float delta = 1;
         Vector2 topLeft = Center + new Vector2(-delta, -delta);
         Vector2 topRight = Center + new Vector2(delta, -delta);
         Vector2 bottomLeft = Center + new Vector2(-delta, delta);

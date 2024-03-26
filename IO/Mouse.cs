@@ -32,18 +32,42 @@ public class RaylibMouse : IMouse
 }
 public class HandleMouseInput : IMouse
 {
+    private IMouse Mouse;
+    private MouseButton Button;
     public HandleMouseInput(IMouse mouse, MouseButton button)
     {
         Mouse = mouse;
         Button = button;
     }
-    private IMouse Mouse;
-    private MouseButton Button;
     public bool IsButtonPressed(MouseButton button) => button == Button ? false : Mouse.IsButtonPressed(button);
     public bool IsButtonDown(MouseButton button) => button == Button ? false : Mouse.IsButtonDown(button);
     public bool IsButtonReleased(MouseButton button) => button == Button ? false : Mouse.IsButtonReleased(button);
     public bool IsButtonUp(MouseButton button) => button == Button ? false : Mouse.IsButtonUp(button);
     public Vector2 Position { get { return Mouse.Position; } set { Mouse.Position = value; } }
+    public Vector2 GetDelta() => Mouse.GetDelta();
+    public Vector2 GetMouseWheelMove() => Mouse.GetMouseWheelMove();
+}
+
+public class MousePositionTransform : IMouse
+{
+    Func<Vector2, Vector2> Transform;
+    Func<Vector2, Vector2> InverseTransform;
+    private IMouse Mouse;
+    public MousePositionTransform(IMouse mouse, Func<Vector2, Vector2> transform, Func<Vector2, Vector2> inverseTransform)
+    {
+        Mouse = mouse;
+        Transform = transform;
+        InverseTransform = inverseTransform;
+    }
+    public bool IsButtonPressed(MouseButton button) => Mouse.IsButtonPressed(button);
+    public bool IsButtonDown(MouseButton button) => Mouse.IsButtonDown(button);
+    public bool IsButtonReleased(MouseButton button) => Mouse.IsButtonReleased(button);
+    public bool IsButtonUp(MouseButton button) => Mouse.IsButtonUp(button);
+    public Vector2 Position
+    {
+        get { return Transform(Mouse.Position); }
+        set { Mouse.Position = InverseTransform(value); }
+    }
     public Vector2 GetDelta() => Mouse.GetDelta();
     public Vector2 GetMouseWheelMove() => Mouse.GetMouseWheelMove();
 }

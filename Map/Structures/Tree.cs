@@ -7,17 +7,16 @@ class Tree : IStructure
 {
     public Color Color { get; set; }
     public Vector2 Position { get; set; }
-    private bool MousedOver;
-    private Vector2 MousePosition;
+    private bool DrawLabelNextFrame;
     private Collider Collider { get { return new Collider(Leaves); } }
     public Triangle Leaves
     {
         get
         {
             return new Triangle(
-                new Vector2(-2, 2) + Position,
-                new Vector2(2, 2) + Position,
-                new Vector2(0, -3) + Position
+                new Vector2(-0.5, 0.5) + Position,
+                new Vector2(0.5, 0.5) + Position,
+                new Vector2(0, -1) + Position
             );
         }
     }
@@ -27,22 +26,21 @@ class Tree : IStructure
     }
     public (IKeyboard, IMouse) Update(IKeyboard keyboard, IMouse mouse, float deltaTime)
     {
-        MousedOver = Collides(mouse.Position);
-        MousePosition = mouse.Position;
+        DrawLabelNextFrame = Collides(mouse.Position);
         return (keyboard, mouse);
     }
     public void Draw(IGraphics graphics)
     {
         graphics.Triangle(Leaves, Color);
     }
-    public void DrawLabel(IGraphics graphics)
+    public void DrawLabel(IGraphics graphics, Vector2 position)
     {
-        if (MousedOver)
+        if (DrawLabelNextFrame)
         {
             var dimensions = new Vector2(100, 20);
             Label label = new Label()
                 .SetText("Tree", 12)
-                .SetShape(new Rectangle(MousePosition + dimensions / 2, dimensions))
+                .SetShape(new Rectangle(position + dimensions / 2, dimensions))
                 .SetColors(Color.Black, new Color(220, 220, 220, 255));
             label.Draw(graphics);
         }

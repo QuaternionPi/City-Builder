@@ -14,7 +14,7 @@ public class Map
     private IMapMode Mode;
     public Map(Cell[,] cells, List<Road> roads)
     {
-        CameraMount = new CameraMount(Vector2.Zero, 3);
+        CameraMount = new CameraMount(Vector2.Zero, 5, 4);
         Cells = cells;
         Roads = roads;
         Mode = new MapPaint(this);
@@ -31,6 +31,7 @@ public interface IMapMode
 public interface IMapDraw
 {
     public void Draw(IGraphics graphics);
+    public virtual void DrawLabel(IGraphics graphics, Vector2 position) { }
 }
 public class MapDrawLand : IMapDraw
 {
@@ -43,10 +44,13 @@ public class MapDrawLand : IMapDraw
     {
         graphics.BeginMode2D(Map.Camera);
         foreach (var tile in Map.Tiles) tile.DrawLand(graphics);
-        foreach (var tile in Map.Tiles) tile.DrawFeaures(graphics);
+        foreach (var tile in Map.Tiles) tile.DrawStructures(graphics);
         foreach (var road in Map.Roads) road.Draw(graphics);
-        foreach (var tile in Map.Tiles) tile.DrawFeaureLabel(graphics);
         graphics.EndMode2D();
+    }
+    public void DrawLabel(IGraphics graphics, Vector2 position)
+    {
+        foreach (var tile in Map.Tiles) tile.DrawStructureLabel(graphics, position);
     }
 }
 public class MapDrawZone : IMapDraw
@@ -58,8 +62,10 @@ public class MapDrawZone : IMapDraw
     }
     public void Draw(IGraphics graphics)
     {
+        graphics.BeginMode2D(Map.Camera);
         foreach (var tile in Map.Tiles) tile.DrawZone(graphics);
         foreach (var road in Map.Roads) road.Draw(graphics);
+        graphics.EndMode2D();
     }
 }
 public class MapPaint : IMapMode
@@ -68,6 +74,7 @@ public class MapPaint : IMapMode
     private IMapDraw MapDraw;
     private readonly List<TextButton> Buttons;
     private Land Land;
+    private Vector2 LabelPosition;
     public MapPaint(Map map)
     {
         Land = Land.Ocean;
@@ -148,10 +155,15 @@ public class MapPaint : IMapMode
     }
     public void Update(IKeyboard keyboard, IMouse mouse, float deltaTime)
     {
+        LabelPosition = mouse.Position;
         foreach (TextButton button in Buttons)
             (keyboard, mouse) = button.Update(keyboard, mouse, deltaTime);
+
+        var screenToWorld = Map.Camera.GetScreenToWorld2D;
+        var worldToScreen = Map.Camera.GetWorldToScreen2D;
+        IMouse cameraMouse = new MousePositionTransform(mouse, screenToWorld, worldToScreen);
         foreach (var tile in Map.Tiles)
-            (keyboard, mouse) = tile.Update(keyboard, mouse, deltaTime);
+            (keyboard, cameraMouse) = tile.Update(keyboard, cameraMouse, deltaTime);
 
         if (keyboard.IsKeyDown(KeyboardKey.W))
         {
@@ -178,6 +190,7 @@ public class MapPaint : IMapMode
     public void Draw(IGraphics graphics)
     {
         MapDraw.Draw(graphics);
+        MapDraw.DrawLabel(graphics, LabelPosition);
         foreach (var button in Buttons)
         {
             button.Draw(graphics);

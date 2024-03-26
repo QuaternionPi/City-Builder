@@ -12,8 +12,6 @@ public interface IGraphics
     void EndMode2D();
     void BeginTextureMode(Raylib_cs.RenderTexture2D target);
     void EndTextureMode();
-    Vector2 GetScreenToWorld2D(Vector2 position, Camera camera);
-    Vector2 GetWorldToScreen2D(Vector2 position, Camera camera);
     void Pixel(Vector2 position, Color color);
     void Line(Line line, float thick, Color color);
     void Bezier(Line line, float thick, Color color);

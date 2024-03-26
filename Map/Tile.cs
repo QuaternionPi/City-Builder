@@ -40,15 +40,15 @@ public class Tile
     {
         graphics.Triangle(Triangle, Land.Color);
     }
-    public void DrawFeaures(IGraphics graphics)
+    public void DrawStructures(IGraphics graphics)
     {
         foreach (var structure in Structures)
             structure.Draw(graphics);
     }
-    public void DrawFeaureLabel(IGraphics graphics)
+    public void DrawStructureLabel(IGraphics graphics, Vector2 position)
     {
         foreach (var structure in Structures)
-            structure.DrawLabel(graphics);
+            structure.DrawLabel(graphics, position);
     }
     public void DrawZone(IGraphics graphics)
     {
