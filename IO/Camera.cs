@@ -50,6 +50,13 @@ public readonly struct Camera
 
 public class CameraMount
 {
+    private Vector2 PositionActual { get; set; }
+    public Vector2 Position { get; set; }
+    public float Width { get; protected set; }
+    public float Height { get; protected set; }
+    private float ZoomActual { get; set; }
+    public float Zoom { get; set; }
+    public float Speed;
     public Camera Camera
     {
         get
@@ -62,21 +69,44 @@ public class CameraMount
             );
         }
     }
-    public float Speed;
-    private Vector2 PositionActual { get; set; }
-    public Vector2 Position { get; set; }
-    private float ZoomActual { get; set; }
-    public float Zoom { get; set; }
-    public CameraMount(Vector2 position, float zoom = 1, float speed = 1)
+    public CameraMount(
+        Vector2 position,
+        float width,
+        float height,
+        float zoom = 1,
+        float speed = 1
+    )
     {
         Position = position;
         PositionActual = position;
+        Width = width;
+        Height = height;
         Zoom = zoom;
         ZoomActual = zoom;
         Speed = speed;
     }
     public void Update(float deltaTime)
     {
+        if (Position.X < 0)
+        {
+            Position += Vector2.UnitX * Width;
+            PositionActual += Vector2.UnitX * Width;
+        }
+        if (Position.X > Width)
+        {
+            Position -= Vector2.UnitX * Width;
+            PositionActual -= Vector2.UnitX * Width;
+        }
+        if (Position.Y < 0)
+        {
+            Position += Vector2.UnitY * Height;
+            PositionActual += Vector2.UnitY * Height;
+        }
+        if (Position.Y > Height)
+        {
+            Position -= Vector2.UnitY * Height;
+            PositionActual -= Vector2.UnitY * Height;
+        }
         PositionActual = Vector2.LerpClamped(PositionActual, Position, deltaTime * Speed);
         ZoomActual = float.Lerp(ZoomActual, Zoom, Math.Clamp(deltaTime * Speed, 0, 1));
     }

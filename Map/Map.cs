@@ -14,7 +14,11 @@ public class Map
     private IMapMode Mode;
     public Map(Cell[,] cells, List<Road> roads)
     {
-        CameraMount = new CameraMount(Vector2.Zero, 5, 4);
+        float width = cells.GetLength(0) * 2;
+        float height = cells.GetLength(1) * 2;
+        var zoom = 5;
+        var speed = 4;
+        CameraMount = new CameraMount(Vector2.Zero, width, height, zoom, speed);
         Cells = cells;
         Roads = roads;
         Mode = new MapPaint(this);
