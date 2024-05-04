@@ -14,15 +14,15 @@ class Tree : IStructure
         get
         {
             return new Triangle(
-                new Vector2(-0.5, 0.5) + Position,
-                new Vector2(0.5, 0.5) + Position,
+                new Vector2(-0.4, 0.4) + Position,
+                new Vector2(0.4, 0.4) + Position,
                 new Vector2(0, -1) + Position
             );
         }
     }
     public Tree()
     {
-        Color = Color.DarkPurple;
+        Color = Color.DarkGreen;
     }
     public (IKeyboard, IMouse) Update(IKeyboard keyboard, IMouse mouse, float deltaTime)
     {

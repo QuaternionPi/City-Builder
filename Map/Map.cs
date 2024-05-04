@@ -169,26 +169,29 @@ public class MapPaint : IMapMode
         foreach (var tile in Map.Tiles)
             (keyboard, cameraMouse) = tile.Update(keyboard, cameraMouse, deltaTime);
 
+
+        var positionDelta = 200 * deltaTime * Map.CameraMount.Speed / Map.CameraMount.Zoom;
         if (keyboard.IsKeyDown(KeyboardKey.W))
         {
-            Map.CameraMount.Position -= Vector2.UnitY;
+            Map.CameraMount.Position -= Vector2.UnitY * positionDelta;
         }
         if (keyboard.IsKeyDown(KeyboardKey.S))
         {
-            Map.CameraMount.Position += Vector2.UnitY;
+            Map.CameraMount.Position += Vector2.UnitY * positionDelta;
         }
         if (keyboard.IsKeyDown(KeyboardKey.A))
         {
-            Map.CameraMount.Position -= Vector2.UnitX;
+            Map.CameraMount.Position -= Vector2.UnitX * positionDelta;
         }
         if (keyboard.IsKeyDown(KeyboardKey.D))
         {
-            Map.CameraMount.Position += Vector2.UnitX;
+            Map.CameraMount.Position += Vector2.UnitX * positionDelta;
         }
+        Map.CameraMount.Zoom += mouse.GetMouseWheelMove().Y * 200 * deltaTime;
 
         Land land = Land;
         if (mouse.IsButtonDown(MouseButton.Left))
-            Paint(mouse.Position, land);
+            Paint(cameraMouse.Position, land);
         Map.CameraMount.Update(deltaTime);
     }
     public void Draw(IGraphics graphics)

@@ -1,7 +1,8 @@
-using System.Numerics;
+using CityBuilder.Numerics;
 using Raylib_cs;
 
 namespace CityBuilder.IO;
+
 public static class Window
 {
     public static void Init(int width, int height, string title) =>

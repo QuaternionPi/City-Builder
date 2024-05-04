@@ -12,8 +12,7 @@ public class Font
     }
     public Vector2 MeasureText(string text, float fontSize, float spacing)
     {
-        System.Numerics.Vector2 systemVector = Raylib_cs.Raylib.MeasureTextEx(Value, text, fontSize, spacing);
-        return new Vector2(systemVector.X, systemVector.Y);
+        return (Vector2)Raylib_cs.Raylib.MeasureTextEx(Value, text, fontSize, spacing);
     }
     public static Font DefaultFont() => new Font(Raylib_cs.Raylib.GetFontDefault());
 }

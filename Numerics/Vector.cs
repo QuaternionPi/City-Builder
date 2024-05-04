@@ -2,6 +2,8 @@ namespace CityBuilder.Numerics;
 
 public readonly struct Vector2 : IEquatable<Vector2>
 {
+    public static implicit operator System.Numerics.Vector2(Vector2 v) => new(v.X, v.Y);
+    public static implicit operator Vector2(System.Numerics.Vector2 v) => new(v.X, v.Y);
     public readonly float X;
     public readonly float Y;
     public Vector2(double x, double y)
