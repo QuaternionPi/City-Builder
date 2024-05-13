@@ -86,6 +86,10 @@ public class CameraMount
     }
     public void Update(float deltaTime)
     {
+        Zoom = Math.Clamp(Zoom, Math.Max(Window.GetDimensions().Y / Height, Window.GetDimensions().X / Width), 1000); // Ensure zoom stays positive
+
+        PositionActual = Vector2.LerpClamped(PositionActual, Position, deltaTime * Speed);
+        ZoomActual = float.Lerp(ZoomActual, Zoom, Math.Clamp(deltaTime * Speed, 0, 1));
         if (Position.X < Width * 0.5)
         {
             Position += Vector2.UnitX * Width;
@@ -96,19 +100,21 @@ public class CameraMount
             Position -= Vector2.UnitX * Width;
             PositionActual -= Vector2.UnitX * Width;
         }
-        if (Position.Y < 0)
+        if (PositionActual.Y < Height * (2.5 / Zoom))
         {
-            Position += Vector2.UnitY * Height;
-            PositionActual += Vector2.UnitY * Height;
+            PositionActual = (Vector2.UnitY * Height * (2.5f / Zoom)) + (Vector2.UnitX * Position.X);
         }
-        if (Position.Y > Height)
+        if (Position.Y < Height * (2.5 / Zoom))
         {
-            Position -= Vector2.UnitY * Height;
-            PositionActual -= Vector2.UnitY * Height;
+            Position = (Vector2.UnitY * Height * (2.5f / Zoom)) + (Vector2.UnitX * Position.X);
         }
-        Zoom = Math.Clamp(Zoom, Math.Max(Window.GetDimensions().Y / Height, Window.GetDimensions().X / Width), 1000); // Ensure zoom stays positive
-
-        PositionActual = Vector2.LerpClamped(PositionActual, Position, deltaTime * Speed);
-        ZoomActual = float.Lerp(ZoomActual, Zoom, Math.Clamp(deltaTime * Speed, 0, 1));
+        if (PositionActual.Y > Height * (-2.5 / Zoom + 1))
+        {
+            PositionActual = (Vector2.UnitY * Height * (-2.5f / Zoom + 1)) + (Vector2.UnitX * Position.X);
+        }
+        if (Position.Y > Height * (-2.5 / Zoom + 1))
+        {
+            Position = (Vector2.UnitY * Height * (-2.5f / Zoom + 1)) + (Vector2.UnitX * Position.X);
+        }
     }
 }
