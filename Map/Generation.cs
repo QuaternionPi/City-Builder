@@ -177,7 +177,7 @@ public static class Generator
     {
         Grid empty = Grid.Empty(x, y);
 
-        Grid continents_grid = empty
+        Grid continentsGrid = empty
             .Run(Automata.Random(0.4, seed - 50))
             .Border(4)
             .Run(Automata.Holstein, 10)
@@ -187,54 +187,39 @@ public static class Generator
 
         Terrain[,] map_base = Create(x, y, Terrain.Grass);
 
-        Terrain[,] continents = continents_grid.Replace(Terrain.Grass, Terrain.Ocean);
+        Terrain[,] continents = continentsGrid.Replace(Terrain.Grass, Terrain.Ocean);
 
-        /*Create(x, y, Terrain.Ocean)
-            .RandomAssign(Terrain.Grass, 0.4, seed - 50)
-            .Border(Terrain.Ocean, 4)
-            .RunAutomataChain(Terrain.Grass, Terrain.Ocean, [
-                (Automata.Holstein, 10),
-                (Automata.Coral, 5),
-                (Automata.Bugs, 20),
-                (Automata.Coral, 5)
-            ]);*/
+        Terrain[,] lakes = empty
+            .Run(Automata.Random(0.15, seed))
+            .Border(8)
+            .Run(Automata.Coral, 10)
+            .Run(Automata.Bugs, 3)
+            .Run(Automata.Smooth, 1)
+            .Replace(Terrain.Lake, Terrain.Grass);
 
-        Terrain[,] lakes = map_base
-            .RandomAssign(Terrain.Lake, 0.15, seed)
-            .Border(Terrain.Grass, 8)
-            .RunAutomataChain(Terrain.Lake, Terrain.Grass, [
-                (Automata.Coral, 10),
-                (Automata.Bugs, 3),
-                (Automata.Smooth, 1)
-            ])
-            .Border(Terrain.Grass, 2);
+        Terrain[,] mountains = empty
+            .Run(Automata.Random(0.4, seed + 50))
+            .Run(Automata.Coral, 1)
+            .Run(Automata.Vote, 15)
+            .Run(Automata.Holstein, 15)
+            .Run(Automata.Random(0.3, seed + 50))
+            .Run(Automata.Holstein, 15)
+            .Replace(Terrain.Mountain, Terrain.Grass);
 
-        Terrain[,] mountains = map_base
-            .RandomAssign(Terrain.Mountain, 0.4, seed + 50)
-            .RunAutomataChain(Terrain.Mountain, Terrain.Grass, [
-                (Automata.Coral, 1),
-                (Automata.Vote, 15),
-                (Automata.Holstein, 15)
-            ])
-            .RandomAssign(Terrain.Grass, 0.3, seed + 50)
-            .RunAutomata(Terrain.Mountain, Terrain.Grass, Automata.Holstein, 15)
-            .Apply((Terrain cell, Terrain[] adjacent) => RemoveLonely(cell, adjacent, 3));
+        Terrain[,] forest = empty
+            .Run(Automata.Random(0.43, seed + 100))
+            .Run(Automata.Bugs, 20)
+            .Replace(Terrain.Forest, Terrain.Grass);
 
-        Terrain[,] forest = map_base
-            .RandomAssign(Terrain.Forest, 0.43, seed + 100)
-            .RunAutomata(Terrain.Forest, Terrain.Grass, Automata.Bugs, 20)
-            .Apply((Terrain cell, Terrain[] adjacent) => RemoveLonely(cell, adjacent, 3));
-
-        Terrain[,] cities = map_base
-            .RandomAssign(Terrain.LowDensity, 0.22, seed + 150)
-            .Border(Terrain.Grass, 5)
-            .RunAutomataChain(Terrain.LowDensity, Terrain.Grass, [
-                (Automata.Bugs, 5),
-                (Automata.Coral, 10),
-                (Automata.Holstein, 5),
-                (Automata.Bugs, 2),
-                (Automata.Smooth, 4),
-            ]);
+        Terrain[,] cities = empty
+            .Run(Automata.Random(0.22, seed + 150))
+            .Border(5)
+            .Run(Automata.Bugs, 5)
+            .Run(Automata.Coral, 10)
+            .Run(Automata.Holstein, 5)
+            .Run(Automata.Bugs, 2)
+            .Run(Automata.Smooth, 4)
+            .Replace(Terrain.LowDensity, Terrain.Grass);
 
         var cullSize = (Feature f) =>
                 f.Size() < 50
