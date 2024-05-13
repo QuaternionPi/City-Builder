@@ -14,6 +14,8 @@ public interface IGraphics
     void EndMode2D();
     void BeginTextureMode(Raylib_cs.RenderTexture2D target);
     void EndTextureMode();
+    public Vector2 GetScreenToWorld2D(Vector2 position, Camera camera);
+    public Vector2 GetWorldToScreen2D(Vector2 position, Camera camera);
     void Pixel(Vector2 position, Color color);
     void Line(Line line, float thick, Color color);
     void Bezier(Line line, float thick, Color color);
@@ -21,7 +23,7 @@ public interface IGraphics
     void Sector(Sector sector, Color color);
     void Ring(Ring ring, Color color);
     void Triangle(Triangle triangle, Color color);
-    void Rectangle(Geometry.Rectangle rectangle, Color color);
+    void Rectangle(Rectangle rectangle, Color color);
     void Text(Font font, string text, Vector2 position, Radian rotation, float fontSize, float spacing, Color color);
 }
 
@@ -52,4 +54,34 @@ public class RaylibGraphics : IGraphics
     }
     public void Text(Font font, string text, Vector2 position, Radian rotation, float fontSize, float spacing, Color color) =>
         Raylib_cs.Raylib.DrawTextPro(font, text, (SystemVector2)(position - font.MeasureText(text, fontSize, spacing) / 2), SystemVector2.Zero, (float)(Degree)rotation, fontSize, spacing, color);
+}
+
+public class QuadTileGraphics : IGraphics
+{
+    private IGraphics Graphics;
+    private Func<Vector2> Dimensions;
+    public QuadTileGraphics(IGraphics graphics, Func<Vector2> dimenstions)
+    {
+        Graphics = graphics;
+        Dimensions = dimenstions;
+    }
+    public void ClearBackground(Color color) => Graphics.ClearBackground(color);
+    public void BeginDrawing() => Graphics.BeginDrawing();
+    public void EndDrawing() => Graphics.EndDrawing();
+    public void BeginMode2D(Camera camera) => Graphics.BeginMode2D(camera);
+    public void EndMode2D() => Graphics.EndMode2D();
+    public void BeginTextureMode(Raylib_cs.RenderTexture2D target) => Graphics.BeginTextureMode(target);
+    public void EndTextureMode() => Graphics.EndTextureMode();
+    public Vector2 GetScreenToWorld2D(Vector2 position, Camera camera) => Graphics.GetScreenToWorld2D(position, camera);
+    public Vector2 GetWorldToScreen2D(Vector2 position, Camera camera) => Graphics.GetWorldToScreen2D(position, camera);
+    public void Pixel(Vector2 position, Color color) => Graphics.Pixel(position, color);
+    public void Line(Line line, float thick, Color color) => Graphics.Line(line, thick, color);
+    public void Bezier(Line line, float thick, Color color) => Graphics.Bezier(line, thick, color);
+    public void Circle(Circle circle, Color color) => Graphics.Circle(circle, color);
+    public void Sector(Sector sector, Color color) => Graphics.Sector(sector, color);
+    public void Ring(Ring ring, Color color) => Graphics.Ring(ring, color);
+    public void Triangle(Triangle triangle, Color color) => Graphics.Triangle(triangle, color);
+    public void Rectangle(Rectangle rectangle, Color color) => Graphics.Rectangle(rectangle, color);
+    public void Text(Font font, string text, Vector2 position, Radian rotation, float fontSize, float spacing, Color color) =>
+        Graphics.Text(font, text, position, rotation, fontSize, spacing, color);
 }
