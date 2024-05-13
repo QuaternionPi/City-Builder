@@ -78,7 +78,6 @@ public class SideTileGraphics : IGraphics
     {
         Vector2 dimensions = Dimensions;
         Vector2 deltaX = new Vector2(dimensions.X, 0);
-        Vector2 deltaY = new Vector2(0, dimensions.Y);
         Graphics.Pixel(position, color);
         Graphics.Pixel(position + deltaX, color);
     }
@@ -86,7 +85,6 @@ public class SideTileGraphics : IGraphics
     {
         Vector2 dimensions = Dimensions;
         Vector2 deltaX = new Vector2(dimensions.X, 0);
-        Vector2 deltaY = new Vector2(0, dimensions.Y);
         Graphics.Line(line, thick, color);
         Graphics.Line((IPolygon<Line>)line + deltaX, thick, color);
     }
@@ -94,7 +92,6 @@ public class SideTileGraphics : IGraphics
     {
         Vector2 dimensions = Dimensions;
         Vector2 deltaX = new Vector2(dimensions.X, 0);
-        Vector2 deltaY = new Vector2(0, dimensions.Y);
         Graphics.Bezier(line, thick, color);
         Graphics.Bezier((IPolygon<Line>)line + deltaX, thick, color);
     }
@@ -102,7 +99,6 @@ public class SideTileGraphics : IGraphics
     {
         Vector2 dimensions = Dimensions;
         Vector2 deltaX = new Vector2(dimensions.X, 0);
-        Vector2 deltaY = new Vector2(0, dimensions.Y);
         Graphics.Circle(circle, color);
         Graphics.Circle(circle + deltaX, color);
     }
@@ -110,7 +106,6 @@ public class SideTileGraphics : IGraphics
     {
         Vector2 dimensions = Dimensions;
         Vector2 deltaX = new Vector2(dimensions.X, 0);
-        Vector2 deltaY = new Vector2(0, dimensions.Y);
         Graphics.Sector(sector, color);
         Graphics.Sector(sector + deltaX, color);
     }
@@ -118,7 +113,6 @@ public class SideTileGraphics : IGraphics
     {
         Vector2 dimensions = Dimensions;
         Vector2 deltaX = new Vector2(dimensions.X, 0);
-        Vector2 deltaY = new Vector2(0, dimensions.Y);
         Graphics.Ring(ring, color);
         Graphics.Ring(ring + deltaX, color);
     }
@@ -126,7 +120,6 @@ public class SideTileGraphics : IGraphics
     {
         Vector2 dimensions = Dimensions;
         Vector2 deltaX = new Vector2(dimensions.X, 0);
-        Vector2 deltaY = new Vector2(0, dimensions.Y);
         Graphics.Triangle(triangle, color);
         Graphics.Triangle((IPolygon<Triangle>)triangle + deltaX, color);
     }
@@ -134,7 +127,6 @@ public class SideTileGraphics : IGraphics
     {
         Vector2 dimensions = Dimensions;
         Vector2 deltaX = new Vector2(dimensions.X, 0);
-        Vector2 deltaY = new Vector2(0, dimensions.Y);
         Graphics.Rectangle(rectangle, color);
         Graphics.Rectangle((IPolygon<Rectangle>)rectangle + deltaX, color);
     }
@@ -142,7 +134,6 @@ public class SideTileGraphics : IGraphics
     {
         Vector2 dimensions = Dimensions;
         Vector2 deltaX = new Vector2(dimensions.X, 0);
-        Vector2 deltaY = new Vector2(0, dimensions.Y);
         Graphics.Text(font, text, position, rotation, fontSize, spacing, color);
         Graphics.Text(font, text, position + deltaX, rotation, fontSize, spacing, color);
     }
