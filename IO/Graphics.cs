@@ -56,11 +56,11 @@ public class RaylibGraphics : IGraphics
         Raylib_cs.Raylib.DrawTextPro(font, text, (SystemVector2)(position - font.MeasureText(text, fontSize, spacing) / 2), SystemVector2.Zero, (float)(Degree)rotation, fontSize, spacing, color);
 }
 
-public class QuadTileGraphics : IGraphics
+public class SideTileGraphics : IGraphics
 {
     private IGraphics Graphics;
-    private Func<Vector2> Dimensions;
-    public QuadTileGraphics(IGraphics graphics, Func<Vector2> dimenstions)
+    private Vector2 Dimensions;
+    public SideTileGraphics(IGraphics graphics, Vector2 dimenstions)
     {
         Graphics = graphics;
         Dimensions = dimenstions;
@@ -74,14 +74,76 @@ public class QuadTileGraphics : IGraphics
     public void EndTextureMode() => Graphics.EndTextureMode();
     public Vector2 GetScreenToWorld2D(Vector2 position, Camera camera) => Graphics.GetScreenToWorld2D(position, camera);
     public Vector2 GetWorldToScreen2D(Vector2 position, Camera camera) => Graphics.GetWorldToScreen2D(position, camera);
-    public void Pixel(Vector2 position, Color color) => Graphics.Pixel(position, color);
-    public void Line(Line line, float thick, Color color) => Graphics.Line(line, thick, color);
-    public void Bezier(Line line, float thick, Color color) => Graphics.Bezier(line, thick, color);
-    public void Circle(Circle circle, Color color) => Graphics.Circle(circle, color);
-    public void Sector(Sector sector, Color color) => Graphics.Sector(sector, color);
-    public void Ring(Ring ring, Color color) => Graphics.Ring(ring, color);
-    public void Triangle(Triangle triangle, Color color) => Graphics.Triangle(triangle, color);
-    public void Rectangle(Rectangle rectangle, Color color) => Graphics.Rectangle(rectangle, color);
-    public void Text(Font font, string text, Vector2 position, Radian rotation, float fontSize, float spacing, Color color) =>
+    public void Pixel(Vector2 position, Color color)
+    {
+        Vector2 dimensions = Dimensions;
+        Vector2 deltaX = new Vector2(dimensions.X, 0);
+        Vector2 deltaY = new Vector2(0, dimensions.Y);
+        Graphics.Pixel(position, color);
+        Graphics.Pixel(position + deltaX, color);
+    }
+    public void Line(Line line, float thick, Color color)
+    {
+        Vector2 dimensions = Dimensions;
+        Vector2 deltaX = new Vector2(dimensions.X, 0);
+        Vector2 deltaY = new Vector2(0, dimensions.Y);
+        Graphics.Line(line, thick, color);
+        Graphics.Line((IPolygon<Line>)line + deltaX, thick, color);
+    }
+    public void Bezier(Line line, float thick, Color color)
+    {
+        Vector2 dimensions = Dimensions;
+        Vector2 deltaX = new Vector2(dimensions.X, 0);
+        Vector2 deltaY = new Vector2(0, dimensions.Y);
+        Graphics.Bezier(line, thick, color);
+        Graphics.Bezier((IPolygon<Line>)line + deltaX, thick, color);
+    }
+    public void Circle(Circle circle, Color color)
+    {
+        Vector2 dimensions = Dimensions;
+        Vector2 deltaX = new Vector2(dimensions.X, 0);
+        Vector2 deltaY = new Vector2(0, dimensions.Y);
+        Graphics.Circle(circle, color);
+        Graphics.Circle(circle + deltaX, color);
+    }
+    public void Sector(Sector sector, Color color)
+    {
+        Vector2 dimensions = Dimensions;
+        Vector2 deltaX = new Vector2(dimensions.X, 0);
+        Vector2 deltaY = new Vector2(0, dimensions.Y);
+        Graphics.Sector(sector, color);
+        Graphics.Sector(sector + deltaX, color);
+    }
+    public void Ring(Ring ring, Color color)
+    {
+        Vector2 dimensions = Dimensions;
+        Vector2 deltaX = new Vector2(dimensions.X, 0);
+        Vector2 deltaY = new Vector2(0, dimensions.Y);
+        Graphics.Ring(ring, color);
+        Graphics.Ring(ring + deltaX, color);
+    }
+    public void Triangle(Triangle triangle, Color color)
+    {
+        Vector2 dimensions = Dimensions;
+        Vector2 deltaX = new Vector2(dimensions.X, 0);
+        Vector2 deltaY = new Vector2(0, dimensions.Y);
+        Graphics.Triangle(triangle, color);
+        Graphics.Triangle((IPolygon<Triangle>)triangle + deltaX, color);
+    }
+    public void Rectangle(Rectangle rectangle, Color color)
+    {
+        Vector2 dimensions = Dimensions;
+        Vector2 deltaX = new Vector2(dimensions.X, 0);
+        Vector2 deltaY = new Vector2(0, dimensions.Y);
+        Graphics.Rectangle(rectangle, color);
+        Graphics.Rectangle((IPolygon<Rectangle>)rectangle + deltaX, color);
+    }
+    public void Text(Font font, string text, Vector2 position, Radian rotation, float fontSize, float spacing, Color color)
+    {
+        Vector2 dimensions = Dimensions;
+        Vector2 deltaX = new Vector2(dimensions.X, 0);
+        Vector2 deltaY = new Vector2(0, dimensions.Y);
         Graphics.Text(font, text, position, rotation, fontSize, spacing, color);
+        Graphics.Text(font, text, position + deltaX, rotation, fontSize, spacing, color);
+    }
 }

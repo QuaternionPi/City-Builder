@@ -46,11 +46,12 @@ public class MapDrawLand : IMapDraw
     }
     public void Draw(IGraphics graphics)
     {
-        graphics.BeginMode2D(Map.Camera);
-        foreach (var tile in Map.Tiles) tile.DrawLand(graphics);
-        foreach (var tile in Map.Tiles) tile.DrawStructures(graphics);
-        foreach (var road in Map.Roads) road.Draw(graphics);
-        graphics.EndMode2D();
+        IGraphics tiledGraphics = new SideTileGraphics(graphics, Window.GetDimensions() / Map.Camera.Zoom);
+        tiledGraphics.BeginMode2D(Map.Camera);
+        foreach (var tile in Map.Tiles) tile.DrawLand(tiledGraphics);
+        foreach (var tile in Map.Tiles) tile.DrawStructures(tiledGraphics);
+        foreach (var road in Map.Roads) road.Draw(tiledGraphics);
+        tiledGraphics.EndMode2D();
     }
     public void DrawLabel(IGraphics graphics, Vector2 position)
     {
@@ -66,7 +67,7 @@ public class MapDrawZone : IMapDraw
     }
     public void Draw(IGraphics graphics)
     {
-        IGraphics tiledGraphics = new QuadTileGraphics(graphics, Window.GetDimensions);
+        IGraphics tiledGraphics = new SideTileGraphics(graphics, Window.GetDimensions() / Map.Camera.Zoom);
         tiledGraphics.BeginMode2D(Map.Camera);
         foreach (var tile in Map.Tiles) tile.DrawZone(tiledGraphics);
         foreach (var road in Map.Roads) road.Draw(tiledGraphics);
