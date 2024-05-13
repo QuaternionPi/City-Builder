@@ -66,10 +66,11 @@ public class MapDrawZone : IMapDraw
     }
     public void Draw(IGraphics graphics)
     {
-        graphics.BeginMode2D(Map.Camera);
-        foreach (var tile in Map.Tiles) tile.DrawZone(graphics);
-        foreach (var road in Map.Roads) road.Draw(graphics);
-        graphics.EndMode2D();
+        IGraphics tiledGraphics = new QuadTileGraphics(graphics, Window.GetDimensions);
+        tiledGraphics.BeginMode2D(Map.Camera);
+        foreach (var tile in Map.Tiles) tile.DrawZone(tiledGraphics);
+        foreach (var road in Map.Roads) road.Draw(tiledGraphics);
+        tiledGraphics.EndMode2D();
     }
 }
 public class MapPaint : IMapMode
