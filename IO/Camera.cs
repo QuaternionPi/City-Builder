@@ -86,12 +86,12 @@ public class CameraMount
     }
     public void Update(float deltaTime)
     {
-        if (Position.X < 0)
+        if (Position.X < Width * 0.5)
         {
             Position += Vector2.UnitX * Width;
             PositionActual += Vector2.UnitX * Width;
         }
-        if (Position.X > Width)
+        if (Position.X > Width * 1.5)
         {
             Position -= Vector2.UnitX * Width;
             PositionActual -= Vector2.UnitX * Width;
