@@ -46,7 +46,7 @@ public class MapDrawLand : IMapDraw
     }
     public void Draw(IGraphics graphics)
     {
-        IGraphics tiledGraphics = new SideTileGraphics(graphics, Window.GetDimensions() / Map.Camera.Zoom);
+        IGraphics tiledGraphics = new SideTileGraphics(graphics, Window.GetDimensions() / 5);
         tiledGraphics.BeginMode2D(Map.Camera);
         foreach (var tile in Map.Tiles) tile.DrawLand(tiledGraphics);
         foreach (var tile in Map.Tiles) tile.DrawStructures(tiledGraphics);
@@ -67,7 +67,7 @@ public class MapDrawZone : IMapDraw
     }
     public void Draw(IGraphics graphics)
     {
-        IGraphics tiledGraphics = new SideTileGraphics(graphics, Window.GetDimensions() / Map.Camera.Zoom);
+        IGraphics tiledGraphics = new SideTileGraphics(graphics, Window.GetDimensions() / 5);
         tiledGraphics.BeginMode2D(Map.Camera);
         foreach (var tile in Map.Tiles) tile.DrawZone(tiledGraphics);
         foreach (var road in Map.Roads) road.Draw(tiledGraphics);
