@@ -9,7 +9,7 @@ public static class Program
         int fps = 60;
         float deltaTime = (float)1 / fps;
 
-        Window.SetTargetFPS(fps);
+        //sWindow.SetTargetFPS(fps);
         Window.SetConfigFlags(Raylib_cs.ConfigFlags.FLAG_MSAA_4X_HINT);
         Window.Init(800, 600, "City Builder");
 
@@ -25,6 +25,7 @@ public static class Program
             graphics.BeginDrawing();
             graphics.ClearBackground(Color.RayWhite);
             map.Draw(graphics);
+            Raylib_cs.Raylib.DrawFPS(20, 20);
             graphics.EndDrawing();
 
             map.Update(keyboard, mouse, deltaTime);
