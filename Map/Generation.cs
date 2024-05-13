@@ -1,9 +1,9 @@
 using CityBuilder.Numerics;
 using CityBuilder.Map.Structures;
 
-namespace CityBuilder.Map;
+namespace CityBuilder.Map.Generation;
 
-public static class MapGen
+public static class Generator
 {
     private enum Terrain
     {
@@ -173,41 +173,23 @@ public static class MapGen
             return partition;
         }
     }
-    private class Automata
-    {
-        public Automata(Func<int, bool> born, Func<int, bool> survive)
-        {
-            Born = born;
-            Survive = survive;
-        }
-        public Func<int, bool> Born;
-        public Func<int, bool> Survive;
-        public static Automata Coral
-        {
-            get { return new Automata((int x) => x == 3, (int x) => x >= 3); }
-        }
-        public static Automata Smooth
-        {
-            get { return new Automata((int x) => x >= 5, (int x) => x >= 4); }
-        }
-        public static Automata Holstein
-        {
-            get { return new Automata((int x) => x >= 5 || x == 3, (int x) => x >= 6 || x == 4); }
-        }
-        public static Automata Bugs
-        {
-            get { return new Automata((int x) => x >= 3 && x != 4 && x != 8, (int x) => x >= 5 || x == 1); }
-        }
-        public static Automata Vote
-        {
-            get { return new Automata((int x) => x >= 5, (int x) => x >= 4); }
-        }
-    }
     public static Map FromSeed(int x, int y, int seed)
     {
+        Grid empty = Grid.Empty(x, y);
+
+        Grid continents_grid = empty
+            .Run(Automata.Random(0.4, seed - 50))
+            .Border(4)
+            .Run(Automata.Holstein, 10)
+            .Run(Automata.Coral, 5)
+            .Run(Automata.Bugs, 20)
+            .Run(Automata.Coral, 5);
+
         Terrain[,] map_base = Create(x, y, Terrain.Grass);
 
-        Terrain[,] continents = Create(x, y, Terrain.Ocean)
+        Terrain[,] continents = continents_grid.Replace(Terrain.Grass, Terrain.Ocean);
+
+        /*Create(x, y, Terrain.Ocean)
             .RandomAssign(Terrain.Grass, 0.4, seed - 50)
             .Border(Terrain.Ocean, 4)
             .RunAutomataChain(Terrain.Grass, Terrain.Ocean, [
@@ -215,7 +197,7 @@ public static class MapGen
                 (Automata.Coral, 5),
                 (Automata.Bugs, 20),
                 (Automata.Coral, 5)
-            ]);
+            ]);*/
 
         Terrain[,] lakes = map_base
             .RandomAssign(Terrain.Lake, 0.15, seed)

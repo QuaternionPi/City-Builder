@@ -12,6 +12,24 @@ static class ArrayExtensions
                 result[i, j] = f(items[i, j]);
         return result;
     }
+    public static (T, int, int)[,] Enumerate<T>(this T[,] items)
+    {
+        int length0 = items.GetLength(0);
+        int length1 = items.GetLength(1);
+        (T, int, int)[,] result = new (T, int, int)[length0, length1];
+        for (int i = 0; i < length0; i += 1)
+            for (int j = 0; j < length1; j += 1)
+                result[i, j] = (items[i, j], i, j);
+        return result;
+    }
+    public static (T, int)[] Enumerate<T>(this IEnumerable<T> items)
+    {
+        int length0 = items.Count();
+        (T, int)[] result = new (T, int)[length0];
+        for (int i = 0; i < length0; i += 1)
+            result[i] = (items.ElementAt(i), i);
+        return result;
+    }
     public static IEnumerable<TResult> SelectMany<TSource, TResult>(
         this TSource[,] source,
         Func<TSource, IEnumerable<TResult>> selector)

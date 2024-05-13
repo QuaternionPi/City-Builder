@@ -14,7 +14,7 @@ public static class Program
         Window.Init(800, 600, "City Builder");
 
         int seed = 1291174;
-        Map.Map map = Map.MapGen.FromSeed(80, 60, seed);
+        Map.Map map = Map.Generation.Generator.FromSeed(80, 60, seed);
 
         IGraphics graphics = new RaylibGraphics();
         IKeyboard keyboard = new RaylibKeyboard();
@@ -32,7 +32,7 @@ public static class Program
             if (keyboard.IsKeyReleased(KeyboardKey.Space))
             {
                 seed++;
-                map = Map.MapGen.FromSeed(80, 60, seed);
+                map = Map.Generation.Generator.FromSeed(80, 60, seed);
             }
         }
         Window.Close();
