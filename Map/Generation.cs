@@ -238,44 +238,6 @@ public static class Generator
 
         return new Map(ToCells(cells), []);
     }
-    private static Terrain[,] Apply(this Terrain[,] input, Evolve evolve, int repeat = 1)
-    {
-        if (repeat <= 0) return input; // recursion base-case
-
-        int x = input.GetLength(0);
-        int y = input.GetLength(1);
-        Terrain[,] output = new Terrain[x, y];
-
-        for (int col = 0; col < x; col++)
-        {
-            for (int row = 0; row < y; row++)
-            {
-                Terrain cell = input[col, row];
-                Terrain[] adjacent = Adjacent(input, col, row);
-                output[col, row] = evolve(cell, adjacent);
-            }
-        }
-        return Apply(output, evolve, repeat - 1);
-    }
-    private static Terrain RemoveLonely(Terrain cell, Terrain[] adjacent, int minSameAdjacent)
-    {
-        IEnumerable<(Terrain, int)> counts =
-            from Terrain in adjacent
-            group Terrain by Terrain into block
-            select (block.Key, block.Count());
-        int sameAdjacentCount = counts.GetValue(cell);
-
-        Terrain output;
-        if (sameAdjacentCount >= minSameAdjacent)
-        {
-            output = cell;
-        }
-        else
-        {
-            output = counts.GetHighestKey();
-        }
-        return output;
-    }
     private static Terrain[,] Line(this Terrain[,] input, Terrain terrain, Vector2[] points, float width)
     {
         int x = input.GetLength(0);
@@ -428,11 +390,6 @@ public static class Generator
         return output;
     }
     private static Draft ToDraft(this Terrain[,] terrain) => new(terrain);
-    private static T[] Adjacent<T>(this T[,] input, int xLoc, int yLoc)
-    {
-        T[,] cells = Neighbourhood(input, xLoc, yLoc);
-        return [cells[0, 0], cells[0, 1], cells[0, 2], cells[1, 0], cells[1, 2], cells[2, 0], cells[2, 1], cells[2, 2]];
-    }
     private static T[,] Neighbourhood<T>(this T[,] input, int xLoc, int yLoc)
     {
         int x = input.GetLength(0);
@@ -448,25 +405,6 @@ public static class Generator
             }
         }
         return output;
-    }
-    private static TValue? GetValue<TKey, TValue>(this IEnumerable<(TKey, TValue?)> keyValuePairs, TKey targetKey)
-    {
-        if (targetKey == null) throw new NullReferenceException("targetKey cannot be null");
-        foreach ((TKey key, TValue? value) in keyValuePairs)
-        {
-            if (targetKey.Equals(key))
-            {
-                return value;
-            }
-        }
-        return default;
-    }
-    private static TKey GetHighestKey<TKey, TValue>(this IEnumerable<(TKey, TValue?)> keyValuePairs)
-    {
-        return
-            (from pair in keyValuePairs
-             orderby pair.Item2
-             select pair.Item1).Last();
     }
     private static Land ToLand(this Terrain terrain) => terrain switch
     {
