@@ -1,6 +1,7 @@
 namespace CityBuilder.Map.Generation;
 
 using System.Diagnostics;
+using System.Net;
 using System.Runtime.CompilerServices;
 using CityBuilder.Geometry;
 
@@ -33,6 +34,20 @@ public readonly struct Automata
     public static Automata Vote
     {
         get { return new Automata((int x) => x >= 5, (int x) => x >= 4); }
+    }
+    public static Automata RemoveLonely(int alive)
+    {
+        Debug.Assert(0 <= alive || 8 >= alive, "alive must be between 0 and 8 inclusive");
+        static bool born(int x) => false;
+        bool survive(int x) => x > alive;
+        return new Automata(born, survive);
+    }
+    public static Automata FillSurounded(int alive)
+    {
+        Debug.Assert(0 <= alive || 8 >= alive, "alive must be between 0 and 8 inclusive");
+        bool born(int x) => x >= alive;
+        static bool survive(int x) => true;
+        return new Automata(born, survive);
     }
     public static Automata Random(double density, int seed)
     {

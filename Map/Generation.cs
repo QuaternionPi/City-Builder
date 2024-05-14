@@ -1,5 +1,6 @@
 using CityBuilder.Numerics;
 using CityBuilder.Map.Structures;
+using System.Net;
 
 namespace CityBuilder.Map.Generation;
 
@@ -183,9 +184,8 @@ public static class Generator
             .Run(Automata.Holstein, 10)
             .Run(Automata.Coral, 5)
             .Run(Automata.Bugs, 20)
-            .Run(Automata.Coral, 5);
-
-        Terrain[,] map_base = Create(x, y, Terrain.Grass);
+            .Run(Automata.Coral, 5)
+            .Run(Automata.FillSurounded(6), 2);
 
         Terrain[,] continents = continentsGrid.Replace(Terrain.Grass, Terrain.Ocean);
 
@@ -198,17 +198,19 @@ public static class Generator
             .Replace(Terrain.Lake, Terrain.Grass);
 
         Terrain[,] mountains = empty
-            .Run(Automata.Random(0.4, seed + 50))
-            .Run(Automata.Coral, 1)
-            .Run(Automata.Vote, 15)
-            .Run(Automata.Holstein, 15)
             .Run(Automata.Random(0.3, seed + 50))
-            .Run(Automata.Holstein, 15)
+            .Run(Automata.Coral, 2)
+            .Run(Automata.Vote, 15)
+            .Run(Automata.Holstein, 5)
+            .Run(Automata.RemoveLonely(2))
+            .Run(Automata.FillSurounded(6))
             .Replace(Terrain.Mountain, Terrain.Grass);
 
         Terrain[,] forest = empty
             .Run(Automata.Random(0.43, seed + 100))
-            .Run(Automata.Bugs, 20)
+            .Run(Automata.Bugs, 12)
+            .Run(Automata.RemoveLonely(3), 3)
+            .Run(Automata.FillSurounded(7))
             .Replace(Terrain.Forest, Terrain.Grass);
 
         Terrain[,] cities = empty
@@ -221,28 +223,17 @@ public static class Generator
             .Run(Automata.Smooth, 4)
             .Replace(Terrain.LowDensity, Terrain.Grass);
 
-        var cullSize = (Feature f) =>
-                f.Size() < 50
-            && (f.Terrain == Terrain.Mountain
-             || f.Terrain == Terrain.Ocean
-             || f.Terrain == Terrain.Forest
-             || f.Terrain == Terrain.Ocean)
-             || (f.Size() > 150 && f.Terrain == Terrain.Mountain);
-
         var cullOcean = (Feature f) =>
                 f.Terrain == Terrain.Lake
             && f.AdjacentFeatures()
                 .Select((Feature f1) => f1.Terrain)
                 .Contains(Terrain.Ocean);
 
-        Terrain[,] cells =
-            forest
+        Terrain[,] cells = forest
             .Cover(cities, [Terrain.LowDensity])
             .Cover(lakes, [Terrain.Lake])
             .Cover(mountains, [Terrain.Mountain])
             .Cover(continents, [Terrain.Ocean])
-            .ToDraft().Cull(cullSize, Terrain.Grass)
-            .Apply((Terrain cell, Terrain[] adjacent) => RemoveLonely(cell, adjacent, 3))
             .ToDraft().Cull(cullOcean, Terrain.Ocean);
 
         return new Map(ToCells(cells), []);
@@ -265,29 +256,6 @@ public static class Generator
             }
         }
         return Apply(output, evolve, repeat - 1);
-    }
-    private static Terrain[,] RunAutomata(this Terrain[,] input, Terrain live, Terrain dead, Automata automata, int repeat)
-    {
-        Terrain evolution(Terrain cell, Terrain[] adjacent)
-        {
-            IEnumerable<(Terrain, int)> counts =
-                from Terrain in adjacent
-                group Terrain by Terrain into block
-                select (block.Key, block.Count());
-            int liveCount = counts.GetValue(live);
-
-            Terrain output;
-            if (cell == live) output = automata.Survive(liveCount) ? live : dead; // if cell is alive does it stay alive
-            else output = automata.Born(liveCount) ? live : cell; // if cell is dead does it become alive
-            return output;
-        }
-        return input.Apply(evolution, repeat);
-    }
-    private static Terrain[,] RunAutomataChain(this Terrain[,] input, Terrain live, Terrain dead, IEnumerable<(Automata, int)> steps)
-    {
-        foreach ((Automata automata, int repeat) in steps)
-            input = RunAutomata(input, live, dead, automata, repeat);
-        return input;
     }
     private static Terrain RemoveLonely(Terrain cell, Terrain[] adjacent, int minSameAdjacent)
     {
@@ -350,44 +318,6 @@ public static class Generator
             }
         }
         return output;
-    }
-    private static Terrain[,] RandomAssign(this Terrain[,] input, Terrain replace, double threshhold, int seed)
-    {
-        Random random = new(seed);
-        int x = input.GetLength(0);
-        int y = input.GetLength(1);
-
-        Terrain[,] output = new Terrain[x, y];
-        for (int col = 0; col < x; col++)
-        {
-            for (int row = 0; row < y; row++)
-            {
-                bool passThreshhold = random.NextDouble() <= threshhold;
-                output[col, row] = passThreshhold ? replace : input[col, row];
-            }
-        }
-        return output;
-    }
-    private static Terrain[,] Border(this Terrain[,] input, Terrain replace, int width)
-    {
-        int x = input.GetLength(0);
-        int y = input.GetLength(1);
-
-        Terrain[,] output = new Terrain[x, y];
-        for (int col = 0; col < x; col++)
-        {
-            for (int row = 0; row < y; row++)
-            {
-                bool onBorder = col < width || col >= (x - width) || row < width || row >= (y - width);
-                output[col, row] = onBorder ? replace : input[col, row];
-            }
-        }
-        return output;
-    }
-    private static Terrain[] CellsBasic(Terrain[,] input)
-    {
-        Terrain terrain = input[1, 1];
-        return [terrain, terrain, terrain, terrain];
     }
     private static Terrain[] CellsSmooth(Terrain[,] input)
     {
@@ -537,19 +467,6 @@ public static class Generator
             (from pair in keyValuePairs
              orderby pair.Item2
              select pair.Item1).Last();
-
-    }
-    private static T[,] Create<T>(int x, int y, T value)
-    {
-        T[,] output = new T[x, y];
-        for (int col = 0; col < x; col++)
-        {
-            for (int row = 0; row < y; row++)
-            {
-                output[col, row] = value;
-            }
-        }
-        return output;
     }
     private static Land ToLand(this Terrain terrain) => terrain switch
     {
