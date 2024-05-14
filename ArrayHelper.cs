@@ -12,11 +12,11 @@ static class ArrayExtensions
                 result[i, j] = function(items[i, j]);
         return result;
     }
-    public static (T, int, int)[,] Enumerate<T>(this T[,] items)
+    public static (TSource, int, int)[,] Enumerate<TSource>(this TSource[,] items)
     {
         int length0 = items.GetLength(0);
         int length1 = items.GetLength(1);
-        (T, int, int)[,] result = new (T, int, int)[length0, length1];
+        (TSource, int, int)[,] result = new (TSource, int, int)[length0, length1];
         for (int i = 0; i < length0; i += 1)
             for (int j = 0; j < length1; j += 1)
                 result[i, j] = (items[i, j], i, j);
@@ -77,7 +77,7 @@ static class ArrayExtensions
                 yield return resultSelector(item, collection);
         }
     }
-    public static bool Contains<T>(this T[,] items, T element)
+    public static bool Contains<TSource>(this TSource[,] items, TSource element)
     {
         int length0 = items.GetLength(0);
         int length1 = items.GetLength(1);
@@ -87,7 +87,7 @@ static class ArrayExtensions
                     return true;
         return false;
     }
-    public static (int, int)[,] ItemIndexs<T>(this T[,] items)
+    public static (int, int)[,] ItemIndexs<TSource>(this TSource[,] items)
     {
         int length0 = items.GetLength(0);
         int length1 = items.GetLength(1);
