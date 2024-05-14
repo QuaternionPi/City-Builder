@@ -1,9 +1,6 @@
-namespace CityBuilder.Map.Generation;
-
 using System.Diagnostics;
-using System.Net;
-using System.Runtime.CompilerServices;
-using CityBuilder.Geometry;
+
+namespace CityBuilder.Map.Generation;
 
 public readonly struct Automata
 {

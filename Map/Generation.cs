@@ -1,6 +1,5 @@
 using CityBuilder.Numerics;
 using CityBuilder.Map.Structures;
-using System.Net;
 
 namespace CityBuilder.Map.Generation;
 
