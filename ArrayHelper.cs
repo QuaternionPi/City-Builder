@@ -2,14 +2,14 @@ namespace CityBuilder;
 
 static class ArrayExtensions
 {
-    public static R[,] Select<T, R>(this T[,] items, Func<T, R> f)
+    public static TResult[,] Select<TSource, TResult>(this TSource[,] items, Func<TSource, TResult> function)
     {
         int length0 = items.GetLength(0);
         int length1 = items.GetLength(1);
-        R[,] result = new R[length0, length1];
+        TResult[,] result = new TResult[length0, length1];
         for (int i = 0; i < length0; i += 1)
             for (int j = 0; j < length1; j += 1)
-                result[i, j] = f(items[i, j]);
+                result[i, j] = function(items[i, j]);
         return result;
     }
     public static (T, int, int)[,] Enumerate<T>(this T[,] items)
@@ -22,10 +22,10 @@ static class ArrayExtensions
                 result[i, j] = (items[i, j], i, j);
         return result;
     }
-    public static (T, int)[] Enumerate<T>(this IEnumerable<T> items)
+    public static (TSource, int)[] Enumerate<TSource>(this IEnumerable<TSource> items)
     {
         int length0 = items.Count();
-        (T, int)[] result = new (T, int)[length0];
+        (TSource, int)[] result = new (TSource, int)[length0];
         for (int i = 0; i < length0; i += 1)
             result[i] = (items.ElementAt(i), i);
         return result;
@@ -97,9 +97,9 @@ static class ArrayExtensions
                 result[i, j] = (i, j);
         return result;
     }
-    public static List<T> ToList<T>(this T[,] items)
+    public static List<TSource> ToList<TSource>(this TSource[,] items)
     {
-        List<T> result = [];
+        List<TSource> result = [];
         foreach (var item in items)
         {
             result.Add(item);
