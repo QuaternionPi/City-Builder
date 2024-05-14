@@ -67,7 +67,7 @@ public class MapDrawZone : IMapDraw
     }
     public void Draw(IGraphics graphics)
     {
-        IGraphics tiledGraphics = new SideTileGraphics(graphics, Window.GetDimensions() / 5);
+        SideTileGraphics tiledGraphics = new(graphics, Window.GetDimensions() / 5);
         tiledGraphics.BeginMode2D(Map.Camera);
         foreach (var tile in Map.Tiles) tile.DrawZone(tiledGraphics);
         foreach (var road in Map.Roads) road.Draw(tiledGraphics);
@@ -165,12 +165,17 @@ public class MapPaint : IMapMode
         foreach (TextButton button in Buttons)
             (keyboard, mouse) = button.Update(keyboard, mouse, deltaTime);
 
-        var screenToWorld = Map.Camera.GetScreenToWorld2D;
-        var worldToScreen = Map.Camera.GetWorldToScreen2D;
+        Vector2 screenToWorld(Vector2 vector)
+        {
+            Vector2 init = Map.Camera.GetScreenToWorld2D(vector);
+            var y = init.Y;
+            var x = init.X % (Map.Cells.GetLength(0) * 2);
+            return new Vector2(x, y);
+        }
+        Vector2 worldToScreen(Vector2 vector) => Map.Camera.GetWorldToScreen2D(vector);
         IMouse cameraMouse = new MousePositionTransform(mouse, screenToWorld, worldToScreen);
         foreach (var tile in Map.Tiles)
             (keyboard, cameraMouse) = tile.Update(keyboard, cameraMouse, deltaTime);
-
 
         var positionDelta = 200 * deltaTime * Map.CameraMount.Speed / Map.CameraMount.Zoom;
         if (keyboard.IsKeyDown(KeyboardKey.W))
