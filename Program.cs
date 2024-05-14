@@ -1,5 +1,4 @@
-﻿using CityBuilder.Geometry;
-using CityBuilder.IO;
+﻿using CityBuilder.IO;
 
 namespace CityBuilder;
 public static class Program
@@ -10,7 +9,7 @@ public static class Program
         float deltaTime = (float)1 / fps;
 
         //sWindow.SetTargetFPS(fps);
-        Window.SetConfigFlags(Raylib_cs.ConfigFlags.FLAG_MSAA_4X_HINT);
+        Window.SetConfigFlags(Window.ConfigFlags.MSAAHint);
         Window.Init(800, 600, "City Builder");
 
         int seed = 1291174;
