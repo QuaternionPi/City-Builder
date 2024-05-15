@@ -128,6 +128,35 @@ public class Grid
         }
         return output.Run(automata, iterations - 1);
     }
+    public Grid Poles(int depth, int seed)
+    {
+        Debug.Assert(depth >= 1, "Poles must be at least 1 cell thick");
+        var random = new Random(seed);
+        Grid output = Clone();
+        foreach ((Automata.Cell cell, int i, int j) in Cells.Enumerate())
+        {
+            var k = Height - j - 1;
+            if (j > depth && k > depth) { continue; }
+            else if (j == 0) { output[i, j] = Automata.Cell.Alive; }
+            else if (k == 0) { output[i, j] = Automata.Cell.Alive; }
+            else
+            {
+                output[i, j] =
+                    output[i, j] == Automata.Cell.Alive
+                || ((output[i, j + 1] == Automata.Cell.Alive
+                || output[i, j - 1] == Automata.Cell.Alive)
+                && random.NextDouble() > 0.5)
+                ? Automata.Cell.Alive : Automata.Cell.Dead;
+                output[i, j] =
+                    output[i, j] == Automata.Cell.Alive
+                || ((output[i, k + 1] == Automata.Cell.Alive
+                || output[i, k - 1] == Automata.Cell.Alive)
+                && random.NextDouble() > 0.5)
+                ? Automata.Cell.Alive : Automata.Cell.Dead;
+            }
+        }
+        return output;
+    }
     public Grid Border(int border)
     {
         Debug.Assert(border >= 0, "Border cannot be less than 0");

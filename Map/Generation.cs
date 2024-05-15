@@ -183,8 +183,15 @@ public static class Generator
             .Run(Automata.Holstein, 10)
             .Run(Automata.Coral, 5)
             .Run(Automata.Bugs, 20)
+            .Border(4)
             .Run(Automata.Coral, 5)
             .Run(Automata.FillSurounded(6), 2);
+
+        Terrain[,] poles = empty
+            .Poles(3, seed)
+            .Run(Automata.Coral)
+            .Run(Automata.FillSurounded(4))
+            .Replace(Terrain.Icecap, Terrain.Grass);
 
         Terrain[,] continents = continentsGrid.Replace(Terrain.Grass, Terrain.Ocean);
 
@@ -233,6 +240,7 @@ public static class Generator
             .Cover(lakes, [Terrain.Lake])
             .Cover(mountains, [Terrain.Mountain])
             .Cover(continents, [Terrain.Ocean])
+            .Cover(poles, [Terrain.Icecap])
             .ToDraft().Cull(cullOcean, Terrain.Ocean);
 
         return new Map(ToCells(cells), []);
