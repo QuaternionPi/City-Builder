@@ -102,7 +102,7 @@ public class CameraMount
         }
         if (PositionActual.Y < Height * (2.5 / Zoom))
         {
-            PositionActual = (Vector2.UnitY * Height * (2.5f / Zoom)) + (Vector2.UnitX * Position.X);
+            PositionActual = (Vector2.UnitY * Height * (2.5f / Zoom)) + (Vector2.UnitX * PositionActual.X);
         }
         if (Position.Y < Height * (2.5 / Zoom))
         {
@@ -110,7 +110,7 @@ public class CameraMount
         }
         if (PositionActual.Y > Height * (-2.5 / Zoom + 1))
         {
-            PositionActual = (Vector2.UnitY * Height * (-2.5f / Zoom + 1)) + (Vector2.UnitX * Position.X);
+            PositionActual = (Vector2.UnitY * Height * (-2.5f / Zoom + 1)) + (Vector2.UnitX * PositionActual.X);
         }
         if (Position.Y > Height * (-2.5 / Zoom + 1))
         {
