@@ -39,7 +39,7 @@ public readonly struct Automata
         bool survive(int x) => x > alive;
         return new Automata(born, survive);
     }
-    public static Automata FillSurounded(int alive)
+    public static Automata FillSurrounded(int alive)
     {
         Debug.Assert(0 <= alive || 8 >= alive, "alive must be between 0 and 8 inclusive");
         bool born(int x) => x >= alive;

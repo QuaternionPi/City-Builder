@@ -87,7 +87,7 @@ static class ArrayExtensions
                     return true;
         return false;
     }
-    public static (int, int)[,] ItemIndexs<TSource>(this TSource[,] items)
+    public static (int, int)[,] ItemIndices<TSource>(this TSource[,] items)
     {
         int length0 = items.GetLength(0);
         int length1 = items.GetLength(1);

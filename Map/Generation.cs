@@ -133,7 +133,7 @@ public static class Generator
         }
         private static List<List<(Terrain, int, int)>> Partition(Terrain[,] input)
         {
-            var nodes = new List<(int, int)>(input.ItemIndexs().ToList());
+            var nodes = new List<(int, int)>(input.ItemIndices().ToList());
             int length0 = input.GetLength(0);
             int length1 = input.GetLength(1);
             HashSet<(int, int)> searched = [];
@@ -185,12 +185,12 @@ public static class Generator
             .Run(Automata.Bugs, 20)
             .Border(4)
             .Run(Automata.Coral, 5)
-            .Run(Automata.FillSurounded(6), 2);
+            .Run(Automata.FillSurrounded(6), 2);
 
         Terrain[,] poles = empty
             .Poles(3, seed)
             .Run(Automata.Coral)
-            .Run(Automata.FillSurounded(4))
+            .Run(Automata.FillSurrounded(4))
             .Replace(Terrain.Icecap, Terrain.Grass);
 
         Terrain[,] continents = continentsGrid.Replace(Terrain.Grass, Terrain.Ocean);
@@ -209,14 +209,14 @@ public static class Generator
             .Run(Automata.Vote, 15)
             .Run(Automata.Holstein, 5)
             .Run(Automata.RemoveLonely(2))
-            .Run(Automata.FillSurounded(6))
+            .Run(Automata.FillSurrounded(6))
             .Replace(Terrain.Mountain, Terrain.Grass);
 
         Terrain[,] forest = empty
             .Run(Automata.Random(0.43, seed + 100))
             .Run(Automata.Bugs, 12)
             .Run(Automata.RemoveLonely(3), 3)
-            .Run(Automata.FillSurounded(7))
+            .Run(Automata.FillSurrounded(7))
             .Replace(Terrain.Forest, Terrain.Grass);
 
         Terrain[,] cities = empty
